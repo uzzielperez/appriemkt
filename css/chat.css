@@ -1,0 +1,150 @@
+body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.chat-section {
+    padding: 100px 0;
+    min-height: 100vh;
+}
+
+.chat-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #222;
+    border-bottom: 1px solid #333;
+}
+
+.chat-header .form-select {
+    background: #333;
+    border: 1px solid #00ffff;
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.chat-header .form-select:focus {
+    border-color: #00ccff;
+    box-shadow: 0 0 8px rgba(0, 204, 255, 0.5);
+    outline: none;
+}
+
+.chat-body {
+    padding: 20px;
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    background: #141414;
+    font-size: 1.1rem;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.message.assistant {
+    background: #00b7b7;
+    color: #fff;
+    margin-left: auto;
+}
+
+.message.user {
+    background: #333;
+    color: #e0e0e0;
+}
+
+.chat-footer {
+    padding: 15px 20px;
+    display: flex;
+    gap: 10px;
+    background: #222;
+    border-top: 1px solid #333;
+}
+
+.chat-footer textarea {
+    flex: 1;
+    background: #333;
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    padding: 10px;
+    color: #e0e0e0;
+    resize: none;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.chat-footer textarea:focus {
+    border-color: #00ccff;
+    box-shadow: 0 0 8px rgba(0, 204, 255, 0.5);
+    outline: none;
+}
+
+.input-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.chat-footer .btn, .chat-header .btn {
+    background: #00b7b7;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.chat-footer .btn:hover, .chat-header .btn:hover {
+    background: #00ccff;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+}
+
+.chat-footer .btn-outline-light {
+    border: 1px solid #00ffff;
+    color: #00ffff;
+}
+
+.chat-footer .btn-outline-light:hover {
+    background: #00ccff;
+    color: #fff;
+}
+
+.chat-info {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+}
+
+.chat-info span {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+}
+
+.chat-info .btn-outline-light {
+    border: 1px solid #00ffff;
+    color: #00ffff;
+    padding: 5px 15px;
+}
+
+.chat-info .btn-outline-light:hover {
+    background: #00ccff;
+    color: #fff;
+}
