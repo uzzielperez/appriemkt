@@ -43,6 +43,10 @@ appriemkt/
 - Heroku CLI (or AWS CLI)
 - API Keys: OpenAI, Anthropic, xAI, DeepSeek, Medical LLM, Stripe
 
+```bash
+npm install express axios stripe multer dotenv
+``` 
+
 ## Setup
 ### Frontend
 1. **Check Files**:
@@ -58,6 +62,7 @@ appriemkt/
 2. **Install**:
    ```bash
    npm install
+   npm init -y
    ```  
 
 ## Runing Locally

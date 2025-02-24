@@ -1,67 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Apprie - Medical AI Chat</title>
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
-    <link href="css/styles.css" rel="stylesheet" />
-    <link href="css/chat.css" rel="stylesheet" /> <!-- New stylesheet for chat -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Apprie - Medical AI Chat</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
+  <link href="css/styles.css" rel="stylesheet" />
+  <style>
+    :root {
+      --grok-bg-color: #0e0e0e;
+      --grok-sidebar-color: #151515;
+      --grok-text-color: #e0e0e0;
+      --grok-accent-color: #5c85fb;
+      --grok-secondary-color: #494949;
+      --grok-hover-color: #2d2d2d;
+      --grok-border-color: #333333;
+    }
+    
+    body {
+      background-color: var(--grok-bg-color);
+      color: var(--grok-text-color);
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #mainNav {
+      background-color: var(--grok-sidebar-color);
+      border-bottom: 1px solid var(--grok-border-color);
+      padding: 10px 0;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link {
+      color: var(--grok-text-color);
+    }
+    
+    .navbar-dark .navbar-nav .nav-link:hover {
+      color: var(--grok-accent-color);
+    }
+    
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-top: 80px;
+      height: calc(100vh - 80px);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h1 {
+      color: var(--grok-accent-color);
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      background-color: var(--grok-bg-color);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--grok-border-color);
+    }
+    
+    .chat-sidebar {
+      width: 250px;
+      background-color: var(--grok-sidebar-color);
+      border-right: 1px solid var(--grok-border-color);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .new-chat-btn {
+      background-color: var(--grok-accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .new-chat-btn:hover {
+      background-color: #4a6fea;
+    }
+    
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .history-item {
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--grok-text-color);
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .history-item:hover {
+      background-color: var(--grok-hover-color);
+    }
+    
+    .chat-main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .chat-header {
+      padding: 15px;
+      border-bottom: 1px solid var(--grok-border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    #api-select {
+      background-color: var(--grok-secondary-color);
+      color: var(--grok-text-color);
+      border: 1px solid var(--grok-border-color);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    
+    #api-select option {
+      background-color: var(--grok-bg-color);
+    }
+    
+    .model-settings {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .settings-btn {
+      background-color: transparent;
+      color: var(--grok-text-color);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 90%;
+    }
+    
+    .message-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      background-color: var(--grok-secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .user-avatar {
+      background-color: var(--grok-accent-color);
+    }
+    
+    .message-content {
+      flex: 1;
+      line-height: 1.5;
+    }
+    
+    .chat-footer {
+      padding: 15px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--grok-border-color);
+    }
+    
+    #query-input {
+      flex: 1;
+      background-color: var(--grok-secondary-color);
+      color: var(--grok-text-color);
+      border: 1px solid var(--grok-border-color);
+      border-radius: 8px;
+      padding: 12px;
+      outline: none;
+      resize: none;
+      min-height: 20px;
+      max-height: 150px;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    #query-input::placeholder {
+      color: #999;
+    }
+    
+    #submit-btn {
+      background-color: var(--grok-accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      height: 45px;
+      width: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    #submit-btn:hover {
+      background-color: #4a6fea;
+    }
+    
+    .chat-info {
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #888;
+      border-top: 1px solid var(--grok-border-color);
+    }
+    
+    #subscribe-btn {
+      background-color: transparent;
+      color: var(--grok-accent-color);
+      border: 1px solid var(--grok-accent-color);
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    #subscribe-btn:hover {
+      background-color: var(--grok-accent-color);
+      color: white;
+    }
+    
+    @media (min-width: 992px) {
+      .chat-container {
+        flex-direction: row;
+      }
+    }
+    
+    @media (max-width: 991px) {
+      .chat-sidebar {
+        display: none;
+      }
+      
+      .chat-section {
+        padding-top: 60px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation (consistent with index.html) -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand" href="index.html"><img src="assets/img/triangular-logo.svg" alt="..." /></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                Menu
-                <i class="fas fa-bars ms-1"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="index.html#Products">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#team">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#support">Support</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
-                </ul>
-            </div>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><img src="assets/img/triangular-logo.svg" alt="Apprie Logo" /></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars ms-1"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html#Products">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#team">Team</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#support">Support</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Chat Interface -->
+  <section class="chat-section">
+    <div class="container">
+      <h1>Apprie Medical AI</h1>
+      <div class="chat-container">
+        <!-- Chat Sidebar - Visible on desktop -->
+        <div class="chat-sidebar">
+          <button class="new-chat-btn">
+            <i class="fas fa-plus"></i> New Chat
+          </button>
+          <div class="chat-history">
+            <div class="history-item">Symptoms of pneumonia</div>
+            <div class="history-item">Drug interaction checker</div>
+            <div class="history-item">Latest treatment for diabetes</div>
+            <div class="history-item">COVID-19 booster information</div>
+          </div>
         </div>
-    </nav>
-
-    <!-- Chat Interface -->
-    <section class="chat-section">
-        <div class="container">
-            <h1 class="text-center mb-4 text-uppercase">Medical AI Chat</h1>
-            <div class="chat-container">
-                <div class="chat-header">
-                    <select id="api-select" class="form-select">
-                        <option value="chatgpt">ChatGPT</option>
-                        <option value="claude">Claude</option>
-                        <option value="grok">Grok</option>
-                        <option value="deepseek">DeepSeek</option>
-                        <option value="medical-llm">Medical LLM</option>
-                    </select>
-                </div>
-                <div class="chat-body" id="response-output"></div>
-                <div class="chat-footer">
-                    <textarea id="query-input" placeholder="Ask a medical question..." rows="3"></textarea>
-                    <button id="submit-btn" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
-                </div>
-                <div class="chat-info">
-                    <span id="token-usage">Tokens used: 0 | Cost: $0.00</span>
-                    <button id="subscribe-btn" class="btn btn-outline-primary">Subscribe for More</button>
-                </div>
+        
+        <!-- Chat Main Area -->
+        <div class="chat-main">
+          <div class="chat-header">
+            <select id="api-select" class="form-select">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="claude">Claude</option>
+              <option value="grok" selected>Grok</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="medical-llm">Medical LLM</option>
+            </select>
+            <div class="model-settings">
+              <button class="settings-btn">
+                <i class="fas fa-cog"></i>
+              </button>
             </div>
+          </div>
+          
+          <div class="chat-body" id="response-output">
+            <!-- Sample messages -->
+            <div class="message">
+              <div class="message-avatar">
+                <i class="fas fa-robot" style="color: white;"></i>
+              </div>
+              <div class="message-content">
+                Hello! I'm Apprie Medical AI powered by Grok. How can I assist you with your medical questions today?
+              </div>
+            </div>
+            
+            <div class="message">
+              <div class="message-avatar user-avatar">
+                <i class="fas fa-user" style="color: white;"></i>
+              </div>
+              <div class="message-content">
+                What are the early symptoms of diabetes?
+              </div>
+            </div>
+            
+            <div class="message">
+              <div class="message-avatar">
+                <i class="fas fa-robot" style="color: white;"></i>
+              </div>
+              <div class="message-content">
+                Early symptoms of diabetes can include:<br><br>
+                • Increased thirst and frequent urination<br>
+                • Extreme hunger<br>
+                • Unexplained weight loss<br>
+                • Fatigue and irritability<br>
+                • Blurred vision<br>
+                • Slow-healing sores or frequent infections<br>
+                • Tingling or numbness in hands or feet (for type 2 diabetes)<br><br>
+                
+                Type 1 diabetes symptoms often develop quickly, while type 2 diabetes symptoms may develop gradually or even be absent. If you're experiencing these symptoms, it's important to consult with a healthcare provider for proper diagnosis and treatment.
+              </div>
+            </div>
+          </div>
+          
+          <div class="chat-footer">
+            <textarea id="query-input" placeholder="Ask a medical question..." rows="1"></textarea>
+            <button id="submit-btn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+          
+          <div class="chat-info">
+            <span id="token-usage">Tokens used: 243 | Cost: $0.0024</span>
+            <button id="subscribe-btn">Upgrade to Pro</button>
+          </div>
         </div>
-    </section>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/scripts.js"></script>
-    <script src="js/chat.js"></script> <!-- New script for chat logic -->
+      </div>
+    </div>
+  </section>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Auto-resize textarea
+    const textarea = document.getElementById('query-input');
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Submit on Enter (but allow Shift+Enter for new lines)
+    textarea.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('submit-btn').click();
+      }
+    });
+    
+    // Basic chat functionality
+    document.getElementById('submit-btn').addEventListener('click', function() {
+      const userInput = textarea.value.trim();
+      if (userInput) {
+        // Add user message
+        const userMessage = document.createElement('div');
+        userMessage.className = 'message';
+        userMessage.innerHTML = `
+          <div class="message-avatar user-avatar">
+            <i class="fas fa-user" style="color: white;"></i>
+          </div>
+          <div class="message-content">
+            ${userInput}
+          </div>
+        `;
+        document.getElementById('response-output').appendChild(userMessage);
+        
+        // Clear input
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        
+        // Simulate AI response (in a real app, this would call your API)
+        const aiMessage = document.createElement('div');
+        aiMessage.className = 'message';
+        aiMessage.innerHTML = `
+          <div class="message-avatar">
+            <i class="fas fa-robot" style="color: white;"></i>
+          </div>
+          <div class="message-content">
+            I'm processing your query about "${userInput}". In a real implementation, this would connect to your selected AI model API.
+          </div>
+        `;
+        
+        // Add AI response after a short delay
+        setTimeout(() => {
+          document.getElementById('response-output').appendChild(aiMessage);
+          document.getElementById('response-output').scrollTop = document.getElementById('response-output').scrollHeight;
+          
+          // Update token count (simulated)
+          const currentTokens = parseInt(document.getElementById('token-usage').textContent.match(/\d+/)[0]);
+          const newTokens = currentTokens + Math.floor(Math.random() * 100) + 50;
+          const cost = (newTokens * 0.00001).toFixed(4);
+          document.getElementById('token-usage').textContent = `Tokens used: ${newTokens} | Cost: $${cost}`;
+        }, 1000);
+        
+        // Scroll to bottom
+        document.getElementById('response-output').scrollTop = document.getElementById('response-output').scrollHeight;
+      }
+    });
+  </script>
 </body>
 </html>

@@ -7,7 +7,8 @@ const upload = multer({ dest: 'uploads/' });
 const app = express();
 
 app.use(express.json());
-app.use(express.static('../')); // Serve frontend files
+// app.use(express.static('../')); // Serve frontend files
+app.use(express.static('../')); // Serve frontend files from the root directory
 
 const API_KEYS = {
     chatgpt: process.env.OPENAI_API_KEY,
