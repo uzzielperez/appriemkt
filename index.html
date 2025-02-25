@@ -41,12 +41,12 @@
             <div class="container">
                 <div class="masthead-subheading">Welcome To Apprie!</div>
                 <div class="masthead-heading text-uppercase">Open Healthcare and AI</div>
-                <a class="btn btn-primary btn-xl text-uppercase" href="#services">Test our Product</a>
+                <a class="btn btn-primary btn-xl text-uppercase" href="chat.html">Test our Product</a>
             </div>
         </header>
         <!-- Services-->
         <section class="page-section" id="services">
-            <div class="container">
+            gmail<div class="container">
                 <div class="text-center">
                     <h2 class="section-heading text-uppercase">Services</h2>
                     <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
@@ -381,6 +381,30 @@
                     <!-- Submit Button-->
                     <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled" id="submitButton" type="submit">Send Message</button></div>
                 </form>
+            </div>
+        </section>
+        <!-- Chat Section -->
+        <section class="page-section" id="chat">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">Chat with Apprie</h2>
+                    <h3 class="section-subheading text-muted">Ask us anything about healthcare and AI.</h3>
+                </div>
+                <div id="chat-container">
+                    <div id="response-output"></div>
+                    <input type="text" id="query-input" placeholder="Enter your query..." class="form-control mb-2">
+                    <input type="file" id="file-upload" class="form-control mb-2">
+                    <button id="submit-btn" class="btn btn-primary mb-2">Submit</button>
+                    <button id="voice-btn" class="btn btn-secondary mb-2">Voice</button>
+                    <button id="deep-search-btn" class="btn btn-info mb-2">Deep Search</button>
+                    <button id="subscribe-btn" class="btn btn-success mb-2">Subscribe</button>
+                    <select id="backend-select" class="form-control mb-2">
+                        <option value="heroku">Heroku</option>
+                        <option value="aws">AWS</option>
+                        <option value="local">Local</option>
+                    </select>
+                    <div id="token-usage" class="text-muted"></div>
+                </div>
             </div>
         </section>
         <!-- Footer-->
