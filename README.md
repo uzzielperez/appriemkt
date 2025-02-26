@@ -109,6 +109,35 @@ heroku config:set OPENAI_API_KEY=your_openai_key  # Repeat for all keys
 
 Update js/chat.js with Heroku URL (e.g., https://your-app-name.herokuapp.com).
 
+## Netlify
+
+Link netlify and start local devleopment server.
+```bash
+npm install -g netlify-cli
+netlify link 
+netlify dev
+```
+
+### Automatic Environment Variables Setup from Local to Production
+
+First go to the root directory and make sure you link your project to netlify.
+Use Netlify CLI to import environment variables from local .env file to production (without exposing the .env file to the public).
+
+```bash
+netlify env: import .env
+```      
+
+Deploy to netlify.
+```bash
+netlify deploy
+```
+
+Important security notes:
+* Never commit .env file to the repository.
+* Rotate your API keys regularly.
+* Consider setting up appropriate usage limits on your API keys.
+* Use separate API keys for development and production environments.
+
 # Contributing
 
 Clone: git clone <repo-url>
