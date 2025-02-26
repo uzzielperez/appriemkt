@@ -85,6 +85,40 @@ npm install express axios stripe multer dotenv
 
 3. **Test**: Click "Test our Product" to access the chat.
 
+4. **Serve the frontend**:
+   - Using VS Code: Install "Live Server" extension and click "Go Live"
+   - Or use any HTTP server of your choice
+
+### Dependencies
+
+Server-side packages:
+- express: Web framework for Node.js
+- cors: Enable Cross-Origin Resource Sharing
+- dotenv: Environment variable management
+- multer: Handle multipart/form-data
+- openai: OpenAI API client
+- @anthropic-ai/sdk: Anthropic API client
+- jspdf: PDF generation
+
+Frontend libraries (CDN):
+- jsPDF: PDF generation in browser
+- Font Awesome: Icons
+
+## Usage
+
+1. Open the application in your browser (default: http://localhost:5500)
+2. Type your medical query in the search box
+3. Select a task type:
+   - General Chat: General medical questions
+   - Symptom Analysis: Detailed symptom assessment
+   - Generate Report: Create medical reports (with PDF export)
+   - Treatment Plan: Get treatment recommendations
+4. View AI responses in the chat interface
+5. For reports, click the PDF icon to download
+
+## Development
+
+### Project Structure
 
 ## Deployment
 
@@ -148,3 +182,28 @@ PR: Submit on GitHub.
 
 ## License
 Licensed under the [GNU Affero General Public License v3.0](./LICENSE). This project is open-source with a copyleft approach—any derivative works, including networked use, must also be licensed under AGPL-3.0 and shared with the community.
+
+### Environment Variables
+
+Required environment variables in `.env`:
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `ANTHROPIC_API_KEY`: Your Anthropic API key (optional)
+- `PORT`: Server port (default: 3000)
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- OpenAI for GPT-4 API
+- Anthropic for Claude API
+- jsPDF for PDF generation
