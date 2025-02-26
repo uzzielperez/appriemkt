@@ -1,123 +1,165 @@
-<script>
-    const BACKEND_CONFIG = {
-        heroku: 'https://your-heroku-app-name.herokuapp.com', // Replace with your Heroku URL
-        aws: 'http://your-ec2-public-ip:3000', // Replace with your EC2 IP
-        local: 'http://localhost:3000' // Local server URL
-    };
+console.log('chat.js loaded');
 
-    const backendSelect = document.getElementById('backend-select');
-    let activeBackend = backendSelect.value;
+// Simplified configuration - just use local for now
+const BACKEND_URL = 'http://localhost:3000';
 
-    backendSelect.addEventListener('change', () => {
-        activeBackend = backendSelect.value;
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+
+    const searchInput = document.querySelector('.search-input');
+    const submitButton = document.querySelector('.submit-button');
+    const chatModal = document.querySelector('.chat-modal');
+    const modalOverlay = document.querySelector('.modal-overlay');
+    const closeChat = document.querySelector('.close-chat');
+    const chatInput = document.querySelector('.chat-input');
+    const chatSendButton = document.querySelector('.chat-send-button');
+    const messagesContainer = document.querySelector('.messages-container');
+    const modelSelect = document.querySelector('#model-select');
+
+    // Auto-resize textareas
+    [searchInput, chatInput].forEach(textarea => {
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
     });
 
-    const responseOutput = document.getElementById('response-output');
-
-    function addMessage(content, isUser = false) {
-        const div = document.createElement('div');
-        div.className = `message ${isUser ? 'user' : 'assistant'}`;
-        div.innerHTML = content;
-        responseOutput.appendChild(div);
-        responseOutput.scrollTop = responseOutput.scrollHeight;
+    // Show modal and overlay
+    function showChat() {
+        modalOverlay.style.display = 'block';
+        chatModal.style.display = 'flex';
     }
 
-    async function thinkMedically(query, fileData, voiceText) {
-        addMessage('Thinking...', false);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate thinking delay
-        return `Analyzing: "${query}"${fileData ? ' with attached data' : ''}${voiceText ? ' and voice input' : ''}.<br>Reasoning: Checking medical context...`;
+    // Hide modal and overlay
+    function hideChat() {
+        modalOverlay.style.display = 'none';
+        chatModal.style.display = 'none';
     }
 
-    // Submit query
-    document.getElementById('submit-btn').addEventListener('click', async () => {
-        const api = document.getElementById('api-select').value;
-        const query = document.getElementById('query-input').value;
-        const fileInput = document.getElementById('file-upload');
-        const file = fileInput.files[0];
-        const tokenUsageDiv = document.getElementById('token-usage');
+    // Initial search submit opens chat modal
+    submitButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (!query) return;
 
-        if (!query && !file) return;
+        // Clear previous messages
+        messagesContainer.innerHTML = '';
+        
+        // Show chat interface
+        showChat();
+        
+        // Send initial message
+        sendMessage(query);
+        
+        // Clear search input
+        searchInput.value = '';
+        searchInput.style.height = 'auto';
+    });
 
-        addMessage(query, true);
-        const thinking = await thinkMedically(query, file, null);
+    // Close chat modal
+    closeChat.addEventListener('click', hideChat);
+    modalOverlay.addEventListener('click', hideChat);
 
-        const formData = new FormData();
-        formData.append('api', api);
-        formData.append('query', query);
-        if (file) formData.append('file', file);
+    // Send message from chat interface
+    chatSendButton.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        sendMessage(message);
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+    });
+
+    // Send on Enter (but allow Shift+Enter for new lines)
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatSendButton.click();
+        }
+    });
+
+    async function sendMessage(message) {
+        // Add user message to chat
+        addMessage(message, true);
+
+        // Add loading indicator
+        const loadingId = addLoadingMessage();
 
         try {
-            addMessage(thinking, false);
-            const response = await fetch(`${BACKEND_CONFIG[activeBackend]}/api/query`, {
+            const formData = new FormData();
+            formData.append('query', message);
+            formData.append('model', modelSelect ? modelSelect.value : 'openai');
+
+            const response = await fetch(`${BACKEND_URL}/api/query`, {
                 method: 'POST',
                 body: formData
             });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
             const data = await response.json();
+            
+            // Remove loading message
+            removeLoadingMessage(loadingId);
+            
+            // Add AI response
             addMessage(data.response, false);
-            tokenUsageDiv.textContent = `Tokens: ${data.tokens} | Cost: $${data.cost.toFixed(2)}`;
-            document.getElementById('query-input').value = '';
-            fileInput.value = '';
+            
         } catch (error) {
-            addMessage(`Error: ${error.message}`, false);
+            console.error('Error:', error);
+            // Remove loading message
+            removeLoadingMessage(loadingId);
+            addMessage('Sorry, there was an error processing your request.', false);
         }
-    });
+    }
 
-    // Voice recording
-    let mediaRecorder;
-    document.getElementById('voice-btn').addEventListener('click', () => {
-        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
-                const chunks = [];
-                mediaRecorder.ondataavailable = e => chunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    const blob = new Blob(chunks, { type: 'audio/webm' });
-                    const formData = new FormData();
-                    formData.append('api', document.getElementById('api-select').value);
-                    formData.append('voice', blob, 'recording.webm');
-                    try {
-                        const response = await fetch(`${BACKEND_CONFIG[activeBackend]}/api/voice`, {
-                            method: 'POST',
-                            body: formData
-                        });
-                        const data = await response.json();
-                        addMessage('Voice input transcribed: ' + data.text, true);
-                        const thinking = await thinkMedically(data.text, null, true);
-                        addMessage(thinking + '<br>' + data.response, false);
-                    } catch (error) {
-                        addMessage(`Error: ${error.message}`, false);
-                    }
-                };
-                mediaRecorder.start();
-                document.getElementById('voice-btn').classList.add('recording');
-            });
-        } else if (mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            document.getElementById('voice-btn').classList.remove('recording');
+    function addMessage(content, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+        messageDiv.textContent = content;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addLoadingMessage() {
+        const loadingDiv = document.createElement('div');
+        const id = 'loading-' + Date.now();
+        loadingDiv.id = id;
+        loadingDiv.className = 'message assistant loading';
+        loadingDiv.textContent = 'Thinking...';
+        messagesContainer.appendChild(loadingDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return id;
+    }
+
+    function removeLoadingMessage(id) {
+        const loadingDiv = document.getElementById(id);
+        if (loadingDiv) {
+            loadingDiv.remove();
         }
-    });
+    }
 
-    // Deep Search
-    document.getElementById('deep-search-btn').addEventListener('click', async () => {
-        const query = document.getElementById('query-input').value;
-        if (!query) return;
-
-        addMessage('Deep searching medical sources...', false);
-        try {
-            const response = await fetch(`${BACKEND_CONFIG[activeBackend]}/api/deep-search`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
-            });
-            const data = await response.json();
-            addMessage(`Deep Search Results:<br>${data.results}`, false);
-        } catch (error) {
-            addMessage(`Error: ${error.message}`, false);
-        }
+    // Category selection
+    const categories = document.querySelectorAll('.category');
+    categories.forEach(category => {
+        category.addEventListener('click', function() {
+            categories.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+        });
     });
-
-    // Subscribe
-    document.getElementById('subscribe-btn').addEventListener('click', () => {
-        window.location.href = `${BACKEND_CONFIG[activeBackend]}/stripe/checkout`;
+    
+    // Suggested prompts
+    const promptCards = document.querySelectorAll('.prompt-card');
+    promptCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const promptText = this.querySelector('.prompt-text').textContent;
+            searchInput.value = promptText;
+            searchInput.style.height = 'auto';
+            searchInput.style.height = (searchInput.scrollHeight) + 'px';
+            searchInput.focus();
+        });
     });
-</script>
+});

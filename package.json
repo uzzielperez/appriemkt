@@ -1,0 +1,9 @@
+{
+    "name": "netlify-chat-app",
+    "version": "1.0.0",
+    "description": "Chat app with multiple AI model support",
+    "dependencies": {
+      "openai": "^4.24.1",
+      "@anthropic-ai/sdk": "^0.10.0"
+    }
+  }
