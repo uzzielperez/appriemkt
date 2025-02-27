@@ -11,9 +11,9 @@ dotenv.config();
 const app = express();
 const upload = multer();
 
-// More detailed CORS setup
+// Update CORS configuration
 app.use(cors({
-    origin: 'http://localhost:5500',
+    origin: '*',  // Allow all origins
     methods: ['GET', 'POST'],
     credentials: true
 }));
@@ -135,10 +135,11 @@ app.post('/api/query', upload.none(), async (req, res) => {
     }
 });
 
+// Update the port to 3000
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Test the server at: http://localhost:${PORT}/test`);
+    console.log(`\nServer running on port ${PORT}`);
+    console.log(`http://localhost:${PORT}\n`);
     console.log('Environment check:', {
         hasOpenAIKey: !!process.env.OPENAI_API_KEY,
         hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY
