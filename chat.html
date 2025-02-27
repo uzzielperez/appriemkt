@@ -443,13 +443,15 @@ body {
 }
 
 .modal-overlay {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1001;
+  backdrop-filter: blur(5px);
 }
 
 .task-bar {
@@ -642,6 +644,88 @@ body {
 .settings-item.privacy-toggle.active i {
   color: #4CAF50;
 }
+
+/* Add these styles */
+.top-right-login {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.login-button {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.login-button:hover {
+  opacity: 1;
+  background: #333;
+}
+
+.login-button.logged-in {
+  color: #4CAF50;
+  opacity: 1;
+}
+
+.login-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1a1a1a;
+  padding: 25px;
+  border-radius: 12px;
+  z-index: 1002;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+}
+
+.login-modal h2 {
+  margin: 0 0 15px 0;
+  color: #fff;
+}
+
+.login-message {
+  margin-bottom: 20px;
+  color: #888;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-form input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.login-form button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.login-form button:hover {
+  opacity: 0.9;
+}
   </style>
 </head>
 <body>
@@ -684,6 +768,7 @@ body {
       <div class="category">Education</div>
       <div class="category">Administration</div>
       <div class="category">Billing</div>
+      <div class="category">Marketplace</div>
     </div>
     
     <div class="suggested-prompts">
@@ -761,6 +846,25 @@ body {
             </button>
         </div>
     </div>
+  </div>
+
+  <!-- Add login modal -->
+  <div class="modal-overlay"></div>
+  <div class="login-modal">
+      <h2>Login Required</h2>
+      <p class="login-message">Please login to access this feature</p>
+      <form class="login-form">
+          <input type="email" placeholder="Email" required>
+          <input type="password" placeholder="Password" required>
+          <button type="submit">Login</button>
+      </form>
+  </div>
+
+  <!-- Add login button to top right -->
+  <div class="top-right-login">
+      <button class="login-button" title="Login">
+          <i class="fas fa-user"></i>
+      </button>
   </div>
 
   <script src="js/chat-service.js"></script>

@@ -466,4 +466,125 @@ document.addEventListener('DOMContentLoaded', function() {
             clearTimeout(blurTimeout);
         }
     });
+
+    // Add login-related elements
+    const loginButton = document.querySelector('.login-button');
+    const loginModal = document.querySelector('.login-modal');
+    const loginForm = document.querySelector('.login-form');
+    const loginMessage = document.querySelector('.login-message');
+    const attachButton = document.querySelector('.fa-paperclip').parentElement;
+    const microphoneButton = document.querySelector('.fa-microphone').parentElement;
+    const modelOptions = document.querySelectorAll('.model-select option');
+
+    let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    let currentFeature = '';
+
+    // Initialize login state
+    if (isLoggedIn && loginButton) {
+        loginButton.classList.add('logged-in');
+        loginButton.querySelector('i').className = 'fas fa-user-check';
+    }
+
+    // Login button handler
+    if (loginButton) {
+        loginButton.addEventListener('click', () => {
+            if (!isLoggedIn) {
+                showLoginModal('account');
+            }
+        });
+    }
+
+    // Attach file handler
+    if (attachButton) {
+        attachButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) {
+                showLoginModal('file attachment');
+            } else {
+                // Handle file attachment for logged-in users
+                // Add your file handling code here
+            }
+        });
+    }
+
+    // Microphone handler
+    if (microphoneButton) {
+        microphoneButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) {
+                showLoginModal('voice input');
+            } else {
+                // Handle microphone for logged-in users
+                // Add your microphone handling code here
+            }
+        });
+    }
+
+    // Model select handler
+    modelSelect?.addEventListener('change', (e) => {
+        if (!isLoggedIn) {
+            e.preventDefault();
+            const selectedOption = e.target.options[e.target.selectedIndex].text;
+            showLoginModal(`${selectedOption} model`);
+            // Reset to first option
+            e.target.selectedIndex = 0;
+        }
+    });
+
+    function showLoginModal(feature) {
+        currentFeature = feature;
+        loginMessage.textContent = `Please login to access ${feature}`;
+        modalOverlay.style.display = 'block';
+        loginModal.style.display = 'block';
+    }
+
+    // Close modal on overlay click
+    modalOverlay?.addEventListener('click', () => {
+        loginModal.style.display = 'none';
+        modalOverlay.style.display = 'none';
+    });
+
+    // Handle login form submission
+    loginForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = loginForm.querySelector('input[type="email"]').value;
+        const password = loginForm.querySelector('input[type="password"]').value;
+
+        // Add your actual login logic here
+        console.log('Login attempt:', { email, feature: currentFeature });
+
+        // For demo purposes, always "succeed"
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Update UI
+        loginButton.classList.add('logged-in');
+        loginButton.querySelector('i').className = 'fas fa-user-check';
+        
+        // Close modal
+        loginModal.style.display = 'none';
+        modalOverlay.style.display = 'none';
+
+        // Clear form
+        loginForm.reset();
+
+        // Handle the original feature request
+        handlePostLogin(currentFeature);
+    });
+
+    function handlePostLogin(feature) {
+        switch(feature) {
+            case 'file attachment':
+                // Trigger file input
+                break;
+            case 'voice input':
+                // Start voice recording
+                break;
+            default:
+                if (feature.includes('model')) {
+                    // Handle model selection
+                }
+                break;
+        }
+    }
 });
