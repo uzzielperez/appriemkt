@@ -22,6 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentTask = 'symptoms';
     let reportData = null;
 
+    // Initialize privacy mode
+    let isPrivacyMode = localStorage.getItem('privacyMode') === 'true';
+    const privacyToggle = document.querySelector('.settings-item.privacy-toggle');
+
+    // Set initial privacy state
+    if (isPrivacyMode && privacyToggle) {
+        privacyToggle.classList.add('active');
+        const icon = privacyToggle.querySelector('i');
+        if (icon) {
+            icon.className = 'fas fa-eye-slash';
+        }
+        applyPrivacyToExistingMessages();
+    }
+
     // Initialize first task button as active
     if (taskButtons.length > 0) {
         taskButtons[0].classList.add('active');
@@ -173,6 +187,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!messagesContainer || !messagesContainer.children.length) {
             alert('No content to generate PDF from!');
             return;
+        }
+
+        // Ask for confirmation if privacy mode is active
+        if (isPrivacyMode) {
+            if (!confirm('Privacy mode is active. Do you want to include all messages in the PDF?')) {
+                return;
+            }
         }
 
         try {
@@ -373,23 +394,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.querySelector('.settings-item.privacy-toggle').addEventListener('click', () => {
-        const icon = document.querySelector('.settings-item.privacy-toggle i');
-        const isPrivate = icon.classList.contains('fa-eye-slash');
-        
-        icon.className = isPrivate ? 'fas fa-eye' : 'fas fa-eye-slash';
-        togglePrivacyMode(!isPrivate);
-    });
+    // Privacy toggle handler
+    if (privacyToggle) {
+        privacyToggle.addEventListener('click', () => {
+            isPrivacyMode = !isPrivacyMode;
+            privacyToggle.classList.toggle('active');
+            
+            const icon = privacyToggle.querySelector('i');
+            if (icon) {
+                icon.className = isPrivacyMode ? 'fas fa-eye-slash' : 'fas fa-eye';
+            }
 
-    document.querySelector('.settings-item.login').addEventListener('click', () => {
-        // Implement login functionality
-        alert('Login functionality coming soon!');
-    });
-
-    function togglePrivacyMode(enabled) {
-        const messages = document.querySelectorAll('.message');
-        messages.forEach(msg => {
-            msg.classList.toggle('private', enabled);
+            localStorage.setItem('privacyMode', isPrivacyMode);
+            applyPrivacyToExistingMessages();
+            
+            // Debug log
+            console.log('Privacy mode:', isPrivacyMode);
         });
     }
+
+    function applyPrivacyToExistingMessages() {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(msg => {
+            if (isPrivacyMode) {
+                msg.classList.add('private');
+            } else {
+                msg.classList.remove('private');
+            }
+        });
+    }
+
+    // Update message adding function
+    function addMessageToChat(message, role) {
+        if (!messagesContainer) return;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        messageDiv.textContent = message;
+        
+        if (isPrivacyMode) {
+            messageDiv.classList.add('private');
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Debug log
+        console.log('Added message with privacy:', isPrivacyMode);
+    }
+
+    // Add keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'p') {
+            e.preventDefault();
+            if (privacyToggle) {
+                privacyToggle.click();
+            }
+        }
+    });
+
+    // Auto-blur on inactivity
+    let blurTimeout;
+    document.addEventListener('mouseleave', () => {
+        if (isPrivacyMode) {
+            blurTimeout = setTimeout(applyPrivacyToExistingMessages, 30000);
+        }
+    });
+
+    document.addEventListener('mouseenter', () => {
+        if (blurTimeout) {
+            clearTimeout(blurTimeout);
+        }
+    });
 });
