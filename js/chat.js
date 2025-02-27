@@ -170,33 +170,125 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generatePDF() {
-        const messagesContainer = document.querySelector('.messages-container');
         if (!messagesContainer || !messagesContainer.children.length) {
             alert('No content to generate PDF from!');
             return;
         }
 
-        // Create PDF content
-        let pdfContent = `${currentTask.toUpperCase()} REPORT\n\n`;
-        pdfContent += `Date: ${new Date().toLocaleString()}\n\n`;
-        
-        // Add messages
-        Array.from(messagesContainer.children).forEach(msg => {
-            const role = msg.classList.contains('user') ? 'Patient' : 'MedCopilot';
-            pdfContent += `${role}: ${msg.textContent}\n\n`;
-        });
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            let yPosition = margin;
 
-        // Generate PDF using jsPDF
+            // Add logo
+            const logoImg = new Image();
+            logoImg.src = 'assets/img/triangular-logo.png';
+
+            logoImg.onload = function() {
+                // Add logo
+                const logoWidth = 20;
+                const logoHeight = (logoWidth * logoImg.height) / logoImg.width;
+                doc.addImage(logoImg, 'PNG', margin, yPosition, logoWidth, logoHeight);
+
+                // Add Apprie text next to logo
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.text('Apprie', margin + logoWidth + 5, yPosition + (logoHeight/2));
+
+                // Move position down after header
+                yPosition += Math.max(logoHeight, 10) + 10;
+
+                // Add report title and date
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                const title = `Medical Report`;
+                const date = `Date: ${new Date().toLocaleString()}`;
+                
+                doc.text(title, margin, yPosition);
+                yPosition += 7;
+                doc.text(date, margin, yPosition);
+                yPosition += 15;
+
+                // Add messages with pagination
+                doc.setFontSize(12);
+                const messages = Array.from(messagesContainer.children);
+                
+                messages.forEach(msg => {
+                    const role = msg.classList.contains('user') ? 'Patient' : 'MedCopilot';
+                    const content = `${role}: ${msg.textContent}`;
+                    
+                    // Split text to fit page width
+                    const splitText = doc.splitTextToSize(content, pageWidth - (2 * margin));
+                    
+                    // Check if we need a new page
+                    if (yPosition + (splitText.length * 7) > pageHeight - margin) {
+                        doc.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    // Add text
+                    doc.text(splitText, margin, yPosition);
+                    yPosition += (splitText.length * 7) + 5;
+                });
+
+                // Save the PDF
+                doc.save(`apprie-medical-report-${new Date().toISOString().slice(0,10)}.pdf`);
+            };
+
+            logoImg.onerror = function() {
+                console.error('Error loading logo');
+                generatePDFWithoutLogo();
+            };
+
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('Error generating PDF. Please try again.');
+        }
+    }
+
+    // Fallback function if logo fails to load
+    function generatePDFWithoutLogo() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Add content
-        const splitText = doc.splitTextToSize(pdfContent, 180);
-        doc.setFontSize(12);
-        doc.text(splitText, 15, 15);
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        let yPosition = margin;
 
-        // Save PDF
-        doc.save(`medcopilot-${currentTask}-${new Date().toISOString().slice(0,10)}.pdf`);
+        // Add title without logo
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Apprie Medical Report', margin, yPosition);
+        yPosition += 15;
+
+        // Add date
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Date: ${new Date().toLocaleString()}`, margin, yPosition);
+        yPosition += 15;
+
+        // Add messages with pagination
+        const messages = Array.from(messagesContainer.children);
+        
+        messages.forEach(msg => {
+            const role = msg.classList.contains('user') ? 'Patient' : 'MedCopilot';
+            const content = `${role}: ${msg.textContent}`;
+            
+            const splitText = doc.splitTextToSize(content, pageWidth - (2 * margin));
+            
+            if (yPosition + (splitText.length * 7) > pageHeight - margin) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            
+            doc.text(splitText, margin, yPosition);
+            yPosition += (splitText.length * 7) + 5;
+        });
+
+        doc.save(`apprie-medical-report-${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     // Submit button handler
