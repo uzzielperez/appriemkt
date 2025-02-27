@@ -15,6 +15,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -390,20 +391,24 @@
                     <h2 class="section-heading text-uppercase">Chat with Apprie</h2>
                     <h3 class="section-subheading text-muted">Ask us anything about healthcare and AI.</h3>
                 </div>
-                <div id="chat-container">
-                    <div id="response-output"></div>
-                    <input type="text" id="query-input" placeholder="Enter your query..." class="form-control mb-2">
-                    <input type="file" id="file-upload" class="form-control mb-2">
-                    <button id="submit-btn" class="btn btn-primary mb-2">Submit</button>
-                    <button id="voice-btn" class="btn btn-secondary mb-2">Voice</button>
-                    <button id="deep-search-btn" class="btn btn-info mb-2">Deep Search</button>
-                    <button id="subscribe-btn" class="btn btn-success mb-2">Subscribe</button>
-                    <select id="backend-select" class="form-control mb-2">
-                        <option value="heroku">Heroku</option>
-                        <option value="aws">AWS</option>
-                        <option value="local">Local</option>
-                    </select>
-                    <div id="token-usage" class="text-muted"></div>
+                <div class="search-container">
+                    <div class="search-box">
+                        <textarea class="search-input" placeholder="Ask a question..." rows="1"></textarea>
+                        <div class="search-actions">
+                            <button class="action-button theme-toggle-btn" title="Change Theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                            <button class="action-button privacy-toggle" title="Privacy Settings">
+                                <i class="fas fa-lock"></i>
+                            </button>
+                            <button class="action-button microphone-button">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="action-button submit-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

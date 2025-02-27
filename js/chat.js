@@ -3,9 +3,14 @@ console.log('chat.js loaded');
 // Simplified configuration - just use local for now
 const BACKEND_URL = 'http://localhost:3000';
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
+let isSubscriber = false; // This will come from your auth system
+let isPrivacyEnabled = false;
+let encryptionKey = null;
 
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chat.js loaded');
+
+    // Get DOM elements
     const searchInput = document.querySelector('.search-input');
     const submitButton = document.querySelector('.submit-button');
     const chatModal = document.querySelector('.chat-modal');
@@ -20,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadPdfButton = document.querySelector('.download-pdf-button');
     let currentTask = 'chat';
     let reportData = null;
+
+    console.log('Submit button:', submitButton);
+    console.log('Chat modal:', chatModal);
 
     // Initialize first task button as active
     if (taskButtons.length > 0) {
@@ -73,18 +81,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    const privacyToggle = document.querySelector('.privacy-toggle');
+    const privacyMenu = document.querySelector('.privacy-menu');
+    const upgradeButton = document.querySelector('.upgrade-button');
+    
+    // Privacy toggle handler
+    privacyToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        privacyMenu.style.display = privacyMenu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Close privacy menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!privacyMenu.contains(e.target) && !privacyToggle.contains(e.target)) {
+            privacyMenu.style.display = 'none';
+        }
+    });
+
+    // Upgrade button handler
+    upgradeButton.addEventListener('click', () => {
+        // Replace with your subscription flow
+        window.location.href = '/subscribe';
+    });
+
     async function sendMessage(message) {
-        addMessage(message, true);
+        if (isPrivacyEnabled && !isSubscriber) {
+            addMessage('Please upgrade to Pro to enable privacy features', false);
+            return;
+        }
+
+        let processedMessage = message;
+        if (isPrivacyEnabled && isSubscriber) {
+            // Encrypt message if privacy is enabled
+            processedMessage = await encryptMessage(message);
+        }
+
+        addMessage(processedMessage, true);
         const loadingId = addLoadingMessage();
 
         try {
             const formData = new FormData();
-            formData.append('query', message);
+            formData.append('query', processedMessage);
             formData.append('model', modelSelect ? modelSelect.value : 'openai');
             formData.append('task', currentTask);
 
             console.log('Sending request:', {
-                message,
+                message: processedMessage,
                 task: currentTask,
                 model: modelSelect ? modelSelect.value : 'openai'
             });
@@ -208,32 +250,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Submit button handler
-    submitButton.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        if (!query) return;
-
-        // Show chat modal
-        chatModal.style.display = 'flex';
+    submitButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Submit clicked!');
         
-        // Set initial task to 'report' and update UI
-        currentTask = 'report';
-        taskButtons.forEach(button => {
-            if (button.dataset.task === 'report') {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-        
-        // Show PDF button
-        downloadPdfButton.style.display = 'block';
-        
-        // Send initial message
-        sendMessage(query);
-        
-        // Clear search input
-        searchInput.value = '';
-        searchInput.style.height = 'auto';
+        if (chatModal) {
+            chatModal.style.display = 'flex';
+            console.log('Showing modal');
+        } else {
+            console.error('Chat modal not found!');
+        }
     });
 
     // Chat send button handler
@@ -252,4 +278,155 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear report data when closing chat
         reportData = null;
     });
+
+    // Encryption helper functions
+    async function generateEncryptionKey() {
+        const key = await window.crypto.subtle.generateKey(
+            {
+                name: "AES-GCM",
+                length: 256
+            },
+            true,
+            ["encrypt", "decrypt"]
+        );
+        return key;
+    }
+
+    async function encryptMessage(message) {
+        if (!encryptionKey) {
+            encryptionKey = await generateEncryptionKey();
+        }
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(message);
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        
+        const encryptedData = await window.crypto.subtle.encrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            encryptionKey,
+            data
+        );
+
+        return {
+            data: Array.from(new Uint8Array(encryptedData)),
+            iv: Array.from(iv)
+        };
+    }
+
+    async function decryptMessage(encryptedData) {
+        if (!encryptionKey) return null;
+
+        const decrypted = await window.crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: new Uint8Array(encryptedData.iv)
+            },
+            encryptionKey,
+            new Uint8Array(encryptedData.data)
+        );
+
+        const decoder = new TextDecoder();
+        return decoder.decode(decrypted);
+    }
+
+    // Add subscription check
+    function checkSubscription() {
+        // Replace with your actual subscription check
+        fetch('/api/check-subscription')
+            .then(response => response.json())
+            .then(data => {
+                isSubscriber = data.isSubscriber;
+                updatePrivacyControls();
+            })
+            .catch(error => console.error('Subscription check failed:', error));
+    }
+
+    function updatePrivacyControls() {
+        const privacyOptions = document.querySelectorAll('.privacy-option input');
+        const subscriptionStatus = document.querySelector('.subscription-status');
+        
+        if (isSubscriber) {
+            privacyOptions.forEach(option => option.disabled = false);
+            subscriptionStatus.textContent = 'Pro Plan';
+            subscriptionStatus.style.color = 'var(--primary-color)';
+        }
+    }
+
+    // Initial subscription check
+    checkSubscription();
+
+    const themeToggle = document.querySelector('.theme-toggle-btn');
+    let currentTheme = 'dark';
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent form submission
+            
+            switch(currentTheme) {
+                case 'dark':
+                    setTheme('light');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    break;
+                case 'light':
+                    setTheme('teal');
+                    themeToggle.innerHTML = '<i class="fas fa-palette"></i>';
+                    break;
+                case 'teal':
+                    setTheme('dark');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    break;
+            }
+        });
+    }
+
+    const privacyToggle = document.querySelector('.privacy-toggle');
+    if (privacyToggle) {
+        privacyToggle.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent form submission
+            // Toggle privacy menu or settings
+            alert('Privacy settings coming soon!');
+        });
+    }
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        currentTheme = theme;
+        localStorage.setItem('preferred-theme', theme);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('preferred-theme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+        // Update toggle button icon
+        switch(savedTheme) {
+            case 'light':
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                break;
+            case 'teal':
+                themeToggle.innerHTML = '<i class="fas fa-palette"></i>';
+                break;
+            case 'dark':
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                break;
+        }
+    }
+
+    // Also try clicking anywhere to show modal (temporary test)
+    document.addEventListener('click', () => {
+        console.log('Document clicked');
+        if (chatModal) {
+            chatModal.style.display = 'flex';
+        }
+    });
+
+    // Make sure the modal is in the correct initial state
+    if (chatModal) {
+        chatModal.style.display = 'none';
+        chatModal.style.position = 'fixed';
+        chatModal.style.zIndex = '9999';
+    }
 });
