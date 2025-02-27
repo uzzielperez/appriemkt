@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const taskButtons = document.querySelectorAll('.task-button');
     const downloadPdfButton = document.querySelector('.download-pdf-button');
-    let currentTask = 'chat';
+    const pdfButton = document.querySelector('.pdf-button');
+    let currentTask = 'symptoms';
     let reportData = null;
 
     // Initialize first task button as active
@@ -164,48 +165,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // PDF Generation
-    downloadPdfButton.addEventListener('click', () => {
-        console.log('PDF button clicked');
-        console.log('Current report data:', reportData);
+    if (pdfButton) {
+        pdfButton.addEventListener('click', generatePDF);
+    }
 
-        if (!reportData) {
-            console.error('No report data available');
-            addMessage('Error: Please generate a report first', false);
+    function generatePDF() {
+        const messagesContainer = document.querySelector('.messages-container');
+        if (!messagesContainer || !messagesContainer.children.length) {
+            alert('No content to generate PDF from!');
             return;
         }
 
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        // Create PDF content
+        let pdfContent = `${currentTask.toUpperCase()} REPORT\n\n`;
+        pdfContent += `Date: ${new Date().toLocaleString()}\n\n`;
+        
+        // Add messages
+        Array.from(messagesContainer.children).forEach(msg => {
+            const role = msg.classList.contains('user') ? 'Patient' : 'MedCopilot';
+            pdfContent += `${role}: ${msg.textContent}\n\n`;
+        });
 
-            // Add title
-            doc.setFontSize(20);
-            doc.text('Medical Report', 105, 20, { align: 'center' });
+        // Generate PDF using jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add content
+        const splitText = doc.splitTextToSize(pdfContent, 180);
+        doc.setFontSize(12);
+        doc.text(splitText, 15, 15);
 
-            // Add date
-            doc.setFontSize(12);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
-
-            // Add report content
-            doc.setFontSize(12);
-            const margin = 20;
-            const pageWidth = doc.internal.pageSize.width - (2 * margin);
-            
-            // Format the content nicely
-            const formattedReport = reportData.split('\n').join('\n\n'); // Add extra spacing between lines
-            const splitText = doc.splitTextToSize(formattedReport, pageWidth);
-            
-            doc.text(splitText, margin, 50);
-
-            // Save the PDF
-            doc.save('medical-report.pdf');
-            console.log('PDF generated successfully');
-            addMessage('✅ PDF report generated and downloaded!', false);
-        } catch (error) {
-            console.error('PDF generation error:', error);
-            addMessage('Error generating PDF: ' + error.message, false);
-        }
-    });
+        // Save PDF
+        doc.save(`medcopilot-${currentTask}-${new Date().toISOString().slice(0,10)}.pdf`);
+    }
 
     // Submit button handler
     submitButton.addEventListener('click', () => {
@@ -252,4 +244,60 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear report data when closing chat
         reportData = null;
     });
+
+    // Add clear chat functionality
+    const clearChatButton = document.querySelector('.clear-chat');
+
+    if (clearChatButton && messagesContainer) {
+        clearChatButton.addEventListener('click', () => {
+            // Ask for confirmation
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                messagesContainer.innerHTML = ''; // Clear all messages
+                console.log('Chat history cleared');
+            }
+        });
+    }
+
+    // Settings dropdown functionality
+    const settingsButton = document.querySelector('.settings-button');
+    const settingsDropdown = document.querySelector('.settings-dropdown');
+    
+    settingsButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        settingsDropdown.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        settingsDropdown.classList.remove('show');
+    });
+
+    // Settings actions
+    document.querySelector('.settings-item.generate-pdf').addEventListener('click', generatePDF);
+    
+    document.querySelector('.settings-item.clear-chat').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear the chat history?')) {
+            document.querySelector('.messages-container').innerHTML = '';
+        }
+    });
+
+    document.querySelector('.settings-item.privacy-toggle').addEventListener('click', () => {
+        const icon = document.querySelector('.settings-item.privacy-toggle i');
+        const isPrivate = icon.classList.contains('fa-eye-slash');
+        
+        icon.className = isPrivate ? 'fas fa-eye' : 'fas fa-eye-slash';
+        togglePrivacyMode(!isPrivate);
+    });
+
+    document.querySelector('.settings-item.login').addEventListener('click', () => {
+        // Implement login functionality
+        alert('Login functionality coming soon!');
+    });
+
+    function togglePrivacyMode(enabled) {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(msg => {
+            msg.classList.toggle('private', enabled);
+        });
+    }
 });

@@ -512,6 +512,137 @@ body {
 .download-pdf-button i {
   font-size: 1.2rem;
 }
+
+.clear-chat {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.clear-chat:hover {
+  background: rgba(255, 68, 68, 0.1);
+  transform: scale(1.1);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-bar {
+  display: flex;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--secondary-color);
+}
+
+.task-button {
+  background: none;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.task-button:hover, .task-button.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.pdf-button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pdf-button:hover {
+  background: rgba(255, 68, 68, 0.1);
+  transform: scale(1.05);
+}
+
+.pdf-button i {
+  font-size: 1.2em;
+}
+
+.header-actions {
+  position: relative;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-button i {
+  font-size: 1.2em;
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 180px;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.settings-dropdown.show {
+  display: block;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.settings-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-item i {
+  width: 16px;
+  text-align: center;
+}
   </style>
 </head>
 <body>
@@ -587,12 +718,37 @@ body {
             <img src="assets/img/triangular-logo.svg" alt="Apprie Logo" class="chat-logo">
             <h2>Apprie MedCopilot</h2>
         </div>
+        <div class="header-actions">
+            <button class="settings-button" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="settings-dropdown">
+                <button class="settings-item generate-pdf">
+                    <i class="fas fa-file-pdf"></i>
+                    Generate PDF
+                </button>
+                <button class="settings-item clear-chat">
+                    <i class="fas fa-eraser"></i>
+                    Clear History
+                </button>
+                <button class="settings-item privacy-toggle">
+                    <i class="fas fa-eye"></i>
+                    Privacy Mode
+                </button>
+                <button class="settings-item login">
+                    <i class="fas fa-user"></i>
+                    Login
+                </button>
+            </div>
+        </div>
     </div>
     <div class="task-bar">
-        <button class="task-button" data-task="chat">General Chat</button>
         <button class="task-button" data-task="symptoms">Symptom Analysis</button>
-        <button class="task-button" data-task="report">Generate Report</button>
         <button class="task-button" data-task="treatment">Treatment Plan</button>
+        <button class="task-button" data-task="report">Generate Report</button>
+        <button class="pdf-button" title="Download PDF">
+            <i class="fas fa-file-pdf"></i>
+        </button>
     </div>
     <div class="messages-container"></div>
     <div class="chat-input-container">
