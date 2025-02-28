@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans - AI Chat</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #0056b3;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --border-color: #e1e4e8;
+        }
+
+        body {
+            background-color: var(--background-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        .navbar {
+            background-color: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .back-button {
+            text-decoration: none;
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--secondary-color);
+        }
+
+        .subscription-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        .tiers-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .tier-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .tier-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .recommended {
+            border: 2px solid var(--primary-color);
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .tier-card h3 {
+            color: var(--text-color);
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+
+        .price {
+            font-size: 36px;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .price span {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+        }
+
+        .features-list li {
+            margin: 15px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            color: var(--primary-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .subscribe-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .subscribe-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.02);
+        }
+
+        /* Affiliate Section */
+        .affiliate-section {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .affiliate-section h2 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 40px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .affiliate-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .affiliate-product {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .affiliate-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .affiliate-product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .affiliate-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .affiliate-content h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 1.2em;
+        }
+
+        .affiliate-content p {
+            margin: 0 0 15px 0;
+            color: #666;
+            flex-grow: 1;
+            line-height: 1.5;
+        }
+
+        .affiliate-link {
+            align-self: flex-start;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .affiliate-link:hover {
+            background: var(--secondary-color);
+        }
+
+        .price-tag {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .subscription-container {
+                padding: 0 15px;
+            }
+
+            .tier-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .page-title {
+                font-size: 2em;
+            }
+
+            .affiliate-products {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="chat.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Chat
+        </a>
+    </nav>
+
+    <div class="subscription-container">
+        <h1 class="page-title">Choose Your Subscription Plan</h1>
+        
+        <div class="tiers-container">
+            <div class="tier-card">
+                <h3>Basic</h3>
+                <div class="price">$9.99<span>/month</span></div>
+                <ul class="features-list">
+                    <li>Basic product access</li>
+                    <li>Email support</li>
+                    <li>Basic analytics</li>
+                </ul>
+                <button class="subscribe-btn">Subscribe Now</button>
+            </div>
+
+            <div class="tier-card recommended">
+                <div class="recommended-badge">Recommended</div>
+                <h3>Professional</h3>
+                <div class="price">$19.99<span>/month</span></div>
+                <ul class="features-list">
+                    <li>All Basic features</li>
+                    <li>Priority support</li>
+                    <li>Advanced analytics</li>
+                    <li>Custom reports</li>
+                </ul>
+                <button class="subscribe-btn">Subscribe Now</button>
+            </div>
+
+            <div class="tier-card">
+                <h3>Enterprise</h3>
+                <div class="price">$49.99<span>/month</span></div>
+                <ul class="features-list">
+                    <li>All Professional features</li>
+                    <li>24/7 support</li>
+                    <li>White-label options</li>
+                    <li>API access</li>
+                    <li>Custom integration</li>
+                </ul>
+                <button class="subscribe-btn">Subscribe Now</button>
+            </div>
+        </div>
+
+        <div class="affiliate-section">
+            <h2>Recommended Health Tech Products</h2>
+            <div class="affiliate-products">
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576515652031-fc429bbc4d31" alt="Smart Scale">
+                    <div class="affiliate-content">
+                        <h3>Smart Health Scale</h3>
+                        <p>Advanced body composition analysis with BMI, muscle mass, and body fat tracking</p>
+                        <span class="price-tag">$89.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1579586337278-3befd40fd17a" alt="Health Watch">
+                    <div class="affiliate-content">
+                        <h3>Health Watch Pro</h3>
+                        <p>24/7 heart rate monitoring, ECG, sleep tracking, and activity metrics</p>
+                        <span class="price-tag">$299.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1510017803434-a899398421b3" alt="Fitness Tracker">
+                    <div class="affiliate-content">
+                        <h3>Advanced Fitness Tracker</h3>
+                        <p>Complete activity monitoring with GPS and workout analytics</p>
+                        <span class="price-tag">$129.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="U-Scan Device">
+                    <div class="affiliate-content">
+                        <h3>U-Scan Health Monitor</h3>
+                        <p>Advanced urinalysis device for home health monitoring</p>
+                        <span class="price-tag">$199.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="BP Monitor">
+                    <div class="affiliate-content">
+                        <h3>Smart Blood Pressure Monitor</h3>
+                        <p>Wireless BP monitoring with trend analysis and doctor sharing</p>
+                        <span class="price-tag">$79.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Sleep Sensor">
+                    <div class="affiliate-content">
+                        <h3>Sleep Quality Sensor</h3>
+                        <p>Advanced sleep tracking with detailed sleep stage analysis</p>
+                        <span class="price-tag">$149.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Smart Thermometer">
+                    <div class="affiliate-content">
+                        <h3>Smart Thermometer</h3>
+                        <p>Wireless temperature monitoring with continuous tracking</p>
+                        <span class="price-tag">$59.99</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+
+                <div class="affiliate-product">
+                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Health Apps">
+                    <div class="affiliate-content">
+                        <h3>Premium Health Apps Bundle</h3>
+                        <p>Collection of top-rated health monitoring and tracking apps</p>
+                        <span class="price-tag">$9.99/month</span>
+                        <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.subscribe-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tier = this.parentElement.querySelector('h3').textContent;
+                alert(`Thank you for choosing the ${tier} plan! We'll process your subscription shortly.`);
+            });
+        });
+    </script>
+</body>
+</html> 

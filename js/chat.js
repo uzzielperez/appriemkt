@@ -159,10 +159,90 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Category selection
     const categories = document.querySelectorAll('.category');
+    
     categories.forEach(category => {
         category.addEventListener('click', function() {
+            console.log('Category clicked:', this.textContent); // Debug log
+            
+            // Remove active class from all categories
             categories.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked category
             this.classList.add('active');
+
+            if (this.textContent.trim() === 'Products') {
+                console.log('Products category clicked'); // Debug log
+                
+                // Hide chat interface
+                const chatInterface = document.querySelector('.chat-interface');
+                if (chatInterface) {
+                    chatInterface.style.display = 'none';
+                }
+
+                // Get main content area
+                const mainContent = document.querySelector('.main-content');
+                console.log('Main content element:', mainContent); // Debug log
+
+                if (mainContent) {
+                    mainContent.innerHTML = `
+                        <div class="subscription-container">
+                            <h2>Choose Your Subscription Plan</h2>
+                            <div class="tiers-container">
+                                <div class="tier-card">
+                                    <h3>Basic</h3>
+                                    <div class="price">$9.99/month</div>
+                                    <ul>
+                                        <li>Basic product access</li>
+                                        <li>Email support</li>
+                                        <li>Basic analytics</li>
+                                    </ul>
+                                    <button class="subscribe-btn" data-tier="basic">Subscribe Now</button>
+                                </div>
+
+                                <div class="tier-card recommended">
+                                    <div class="recommended-badge">Recommended</div>
+                                    <h3>Professional</h3>
+                                    <div class="price">$19.99/month</div>
+                                    <ul>
+                                        <li>All Basic features</li>
+                                        <li>Priority support</li>
+                                        <li>Advanced analytics</li>
+                                        <li>Custom reports</li>
+                                    </ul>
+                                    <button class="subscribe-btn" data-tier="pro">Subscribe Now</button>
+                                </div>
+
+                                <div class="tier-card">
+                                    <h3>Enterprise</h3>
+                                    <div class="price">$49.99/month</div>
+                                    <ul>
+                                        <li>All Professional features</li>
+                                        <li>24/7 support</li>
+                                        <li>White-label options</li>
+                                        <li>API access</li>
+                                        <li>Custom integration</li>
+                                    </ul>
+                                    <button class="subscribe-btn" data-tier="enterprise">Subscribe Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    console.log('Subscription content added'); // Debug log
+                } else {
+                    console.error('Main content element not found');
+                }
+            } else {
+                // Handle other categories
+                const chatInterface = document.querySelector('.chat-interface');
+                if (chatInterface) {
+                    chatInterface.style.display = 'block';
+                }
+            }
+
+            // In your category click handler
+            if (this.textContent.trim() === 'Products') {
+                window.location.href = 'subscriptions.html';
+            }
         });
     });
     
@@ -465,5 +545,107 @@ document.addEventListener('DOMContentLoaded', function() {
         if (blurTimeout) {
             clearTimeout(blurTimeout);
         }
+    });
+
+    // Add this function to handle category clicks
+    function handleCategoryClick(category) {
+        if (category === 'Products') {
+            // Hide the chat interface
+            document.querySelector('.chat-interface').style.display = 'none';
+            
+            // Create and show the subscription tiers
+            const mainContent = document.querySelector('.main-content') || document.querySelector('main');
+            mainContent.innerHTML = `
+                <div class="subscription-container">
+                    <h2>Choose Your Subscription Plan</h2>
+                    <div class="tiers-container">
+                        <div class="tier-card">
+                            <h3>Basic</h3>
+                            <div class="price">$9.99/month</div>
+                            <ul>
+                                <li>Basic product access</li>
+                                <li>Email support</li>
+                                <li>Basic analytics</li>
+                            </ul>
+                            <button class="subscribe-btn" data-tier="basic">Subscribe Now</button>
+                        </div>
+
+                        <div class="tier-card recommended">
+                            <div class="recommended-badge">Recommended</div>
+                            <h3>Professional</h3>
+                            <div class="price">$19.99/month</div>
+                            <ul>
+                                <li>All Basic features</li>
+                                <li>Priority support</li>
+                                <li>Advanced analytics</li>
+                                <li>Custom reports</li>
+                            </ul>
+                            <button class="subscribe-btn" data-tier="pro">Subscribe Now</button>
+                        </div>
+
+                        <div class="tier-card">
+                            <h3>Enterprise</h3>
+                            <div class="price">$49.99/month</div>
+                            <ul>
+                                <li>All Professional features</li>
+                                <li>24/7 support</li>
+                                <li>White-label options</li>
+                                <li>API access</li>
+                                <li>Custom integration</li>
+                            </ul>
+                            <button class="subscribe-btn" data-tier="enterprise">Subscribe Now</button>
+                        </div>
+                    </div>
+
+                    <div class="affiliate-section">
+                        <h2>Recommended Products</h2>
+                        <div class="affiliate-products">
+                            <div class="affiliate-product">
+                                <img src="path-to-product1.jpg" alt="Product 1">
+                                <h3>Healthcare Analytics Suite</h3>
+                                <p>Advanced analytics tools for healthcare professionals</p>
+                                <a href="#" class="affiliate-link">Learn More</a>
+                            </div>
+                            <div class="affiliate-product">
+                                <img src="path-to-product2.jpg" alt="Product 2">
+                                <h3>Medical Training Platform</h3>
+                                <p>Comprehensive medical training and certification</p>
+                                <a href="#" class="affiliate-link">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners to subscription buttons
+            document.querySelectorAll('.subscribe-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tier = this.getAttribute('data-tier');
+                    handleSubscription(tier);
+                });
+            });
+        } else {
+            // Handle other categories as before
+            document.querySelector('.chat-interface').style.display = 'block';
+            // Your existing category handling code
+        }
+    }
+
+    function handleSubscription(tier) {
+        // Add your subscription handling logic here
+        console.log(`Subscribing to ${tier} tier`);
+        alert(`Thank you for choosing the ${tier} tier! We'll process your subscription shortly.`);
+    }
+
+    // Update your category click listeners
+    document.querySelectorAll('.category').forEach(category => {
+        category.addEventListener('click', function() {
+            // Remove active class from all categories
+            document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+            // Add active class to clicked category
+            this.classList.add('active');
+            // Handle the category click
+            handleCategoryClick(this.textContent.trim());
+        });
     });
 });
