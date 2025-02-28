@@ -7,14 +7,24 @@ const Anthropic = require('@anthropic-ai/sdk');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const authRoutes = require('./routes/auth');
 
 // Load environment variables
 dotenv.config();
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/apprie')
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB Connection with better error handling
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/apprie', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log('Successfully connected to MongoDB.');
+})
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.log('Please make sure MongoDB is running on your machine.');
+    process.exit(1); // Exit if MongoDB connection fails
+});
 
 const app = express();
 const upload = multer();
@@ -27,23 +37,12 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// User Schema
-const userSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    name: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
+const User = require('./models/User');
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
-
-const User = mongoose.model('User', userSchema);
+// Mount auth routes
+app.use('/api/auth', authRoutes);
 
 // Authentication Routes
 app.post('/api/auth/register', async (req, res) => {
@@ -163,10 +162,7 @@ app.post('/api/query', upload.single('file'), async (req, res) => {
             throw new Error('No query provided');
         }
 
-        if (!model) {
-            throw new Error('No model specified');
-        }
-
+        // Remove any auth check for model selection
         if (model === 'openai') {
             console.log('Using OpenAI API');
             const completion = await openai.chat.completions.create({
@@ -176,7 +172,7 @@ app.post('/api/query', upload.single('file'), async (req, res) => {
             response = {
                 response: completion.choices[0].message.content,
                 tokens: completion.usage.total_tokens,
-                cost: completion.usage.total_tokens * 0.00002 // Approximate cost
+                cost: completion.usage.total_tokens * 0.00002
             };
         } else if (model === 'anthropic') {
             const message = await anthropic.messages.create({
@@ -187,7 +183,7 @@ app.post('/api/query', upload.single('file'), async (req, res) => {
             response = {
                 response: message.content[0].text,
                 tokens: message.usage.output_tokens + message.usage.input_tokens,
-                cost: (message.usage.output_tokens + message.usage.input_tokens) * 0.00002 // Approximate cost
+                cost: (message.usage.output_tokens + message.usage.input_tokens) * 0.00002
             };
         }
 
@@ -196,6 +192,39 @@ app.post('/api/query', upload.single('file'), async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Modify the chat endpoint to skip auth check for preset queries
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message } = req.body;
+        
+        // Add your preset queries list
+        const presetQueries = [
+            "What services do you offer?",
+            "How can I contact support?",
+            // Add other preset queries here
+        ];
+
+        // Skip authentication if it's a preset query
+        if (!presetQueries.includes(message) && !req.isAuthenticated()) {
+            return res.status(401).json({ error: 'Authentication required for custom queries' });
+        }
+
+        // Process the message and return response
+        // Your existing message handling code...
+        
+    } catch (error) {
+        console.error('Chat error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Add logout route
+app.post('/api/auth/logout', (req, res) => {
+    // Clear the JWT cookie if you're using cookies
+    res.clearCookie('jwt');
+    res.status(200).json({ message: 'Logged out successfully' });
 });
 
 const PORT = process.env.PORT || 3000;

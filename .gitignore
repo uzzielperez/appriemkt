@@ -9,3 +9,13 @@ yarn-error.log
 yarn-error.log
 .DS_Store
 .env
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Other sensitive files
+generate-secret.js

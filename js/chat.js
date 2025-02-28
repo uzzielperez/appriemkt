@@ -468,89 +468,204 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add login-related elements
-    const loginButton = document.querySelector('.login-button');
-    const loginModal = document.querySelector('.login-modal');
-    const loginForm = document.querySelector('.login-form');
-    const loginMessage = document.querySelector('.login-message');
-    const attachButton = document.querySelector('.fa-paperclip').parentElement;
-    const microphoneButton = document.querySelector('.fa-microphone').parentElement;
-    const modelOptions = document.querySelectorAll('.model-select option');
+    const loginButton = document.querySelector('.top-right.login') || 
+                       document.querySelector('.top-right-login') ||
+                       document.querySelector('[class*="top-right"][class*="login"]');
+    
+    console.log('Login button found:', loginButton); // Debug log
 
-    let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    let currentFeature = '';
-
-    // Initialize login state
-    if (isLoggedIn && loginButton) {
-        loginButton.classList.add('logged-in');
-        loginButton.querySelector('i').className = 'fas fa-user-check';
+    // Create username span
+    let usernameSpan = document.querySelector('.username-display');
+    if (!usernameSpan) {
+        usernameSpan = document.createElement('span');
+        usernameSpan.className = 'username-display';
+        if (loginButton && loginButton.parentNode) {
+            loginButton.parentNode.insertBefore(usernameSpan, loginButton);
+        }
     }
 
-    // Login button handler
-    if (loginButton) {
-        loginButton.addEventListener('click', () => {
-            if (!isLoggedIn) {
-                showLoginModal('account');
-            }
-        });
+    // Create modal
+    const modalHTML = `
+        <div id="loginModal" class="login-modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.querySelector('#loginModal');
+    if (existingModal) {
+        existingModal.remove();
     }
 
-    // Attach file handler
-    if (attachButton) {
-        attachButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!isLoggedIn) {
-                showLoginModal('file attachment');
-            } else {
-                // Handle file attachment for logged-in users
-                // Add your file handling code here
-            }
-        });
-    }
+    // Add new modal
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // Microphone handler
-    if (microphoneButton) {
-        microphoneButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!isLoggedIn) {
-                showLoginModal('voice input');
-            } else {
-                // Handle microphone for logged-in users
-                // Add your microphone handling code here
-            }
-        });
-    }
+    const modal = document.querySelector('#loginModal');
+    const closeBtn = modal.querySelector('.close');
+    const loginForm = document.querySelector('#loginForm');
 
-    // Model select handler
-    modelSelect?.addEventListener('change', (e) => {
+    console.log('Modal elements:', { modal, closeBtn, loginForm }); // Debug log
+
+    // Login button click handler
+    loginButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Login button clicked'); // Debug log
+        
+        const isLoggedIn = localStorage.getItem('token');
         if (!isLoggedIn) {
-            e.preventDefault();
-            const selectedOption = e.target.options[e.target.selectedIndex].text;
-            showLoginModal(`${selectedOption} model`);
-            // Reset to first option
-            e.target.selectedIndex = 0;
+            modal.style.display = 'block';
+            console.log('Showing modal'); // Debug log
+        } else {
+            handleLogout();
         }
     });
 
-    function showLoginModal(feature) {
-        currentFeature = feature;
-        loginMessage.textContent = `Please login to access ${feature}`;
-        modalOverlay.style.display = 'block';
-        loginModal.style.display = 'block';
-    }
-
-    // Close modal on overlay click
-    modalOverlay?.addEventListener('click', () => {
-        loginModal.style.display = 'none';
-        modalOverlay.style.display = 'none';
+    // Close button handler
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        console.log('Modal closed'); // Debug log
     });
 
-    // Handle login form submission
-    loginForm?.addEventListener('submit', async (e) => {
+    // Click outside modal to close
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            console.log('Modal closed (outside click)'); // Debug log
+        }
+    });
+
+    // Form submission
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = loginForm.querySelector('input[type="email"]').value;
-        const password = loginForm.querySelector('input[type="password"]').value;
+        console.log('Form submitted'); // Debug log
+
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
 
         try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
+            });
+
+            console.log('Login response:', response); // Debug log
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.user.email || data.user.username);
+                modal.style.display = 'none';
+                checkLoginStatus();
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                alert(error.message || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed: ' + error.message);
+        }
+    });
+
+    async function handleLogout() {
+        console.log('Handling logout'); // Debug log
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (response.ok) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                checkLoginStatus();
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    }
+
+    function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        console.log('Checking login status:', { token, username }); // Debug log
+
+        if (token) {
+            usernameSpan.textContent = username || 'User';
+            usernameSpan.style.display = 'inline';
+            loginButton.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+            loginButton.title = 'Logout';
+            loginButton.classList.add('logged-in');
+        } else {
+            usernameSpan.style.display = 'none';
+            loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i>';
+            loginButton.title = 'Login';
+            loginButton.classList.remove('logged-in');
+        }
+    }
+
+    // Initial check
+    checkLoginStatus();
+
+    // Model select handler
+    modelSelect?.addEventListener('change', (e) => {
+        // Remove the auth check, allowing direct model switching
+        const selectedOption = e.target.options[e.target.selectedIndex].text;
+        console.log(`Switched to ${selectedOption}`);
+    });
+
+    // Add these new variables
+    const registerModal = document.querySelector('.register-modal');
+    const registerForm = document.querySelector('.register-form');
+    const switchToRegister = document.querySelector('.switch-to-register');
+    const switchToLogin = document.querySelector('.switch-to-login');
+
+    // Add switch between login and register
+    switchToRegister?.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.style.display = 'none';
+        registerModal.style.display = 'block';
+    });
+
+    switchToLogin?.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'none';
+        loginModal.style.display = 'block';
+    });
+
+    // Handle registration form submission
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = registerForm.querySelector('input[type="text"]').value;
+        const email = registerForm.querySelector('input[type="email"]').value;
+        const password = registerForm.querySelector('input[type="password"]').value;
+
+        try {
+            await registerUser(name, email, password);
+            
+            // Auto login after successful registration
             await loginUser(email, password);
             
             // Update UI
@@ -558,60 +673,73 @@ document.addEventListener('DOMContentLoaded', function() {
             loginButton.querySelector('i').className = 'fas fa-user-check';
             
             // Close modal
-            loginModal.style.display = 'none';
+            registerModal.style.display = 'none';
             modalOverlay.style.display = 'none';
 
             // Clear form
-            loginForm.reset();
+            registerForm.reset();
 
-            // Handle the original feature request
-            if (currentFeature) {
-                handlePostLogin(currentFeature);
-            }
+            alert('Registration successful! You are now logged in.');
         } catch (error) {
             alert(error.message);
         }
     });
 
-    function handlePostLogin(feature) {
-        switch(feature) {
-            case 'file attachment':
-                // Trigger file input
-                break;
-            case 'voice input':
-                // Start voice recording
-                break;
-            default:
-                if (feature.includes('model')) {
-                    // Handle model selection
-                }
-                break;
+    // Add registration function
+    async function registerUser(name, email, password) {
+        try {
+            console.log('Attempting to register user:', { name, email });
+            
+            const response = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            // Log the raw response for debugging
+            const rawResponse = await response.text();
+            console.log('Raw server response:', rawResponse);
+
+            let data;
+            try {
+                data = JSON.parse(rawResponse);
+            } catch (e) {
+                console.error('Failed to parse server response:', e);
+                throw new Error('Server returned invalid JSON');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.user.username || data.user.email);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('isLoggedIn', 'true');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Registration error:', error);
+            throw error;
         }
     }
 
-    // Add logout functionality
-    function logoutUser() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('isLoggedIn');
+    // Add this function near the other message-related functions
+    function displayMessage(message, role) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${role}`;
+        messageDiv.textContent = message;
         
-        loginButton.classList.remove('logged-in');
-        loginButton.querySelector('i').className = 'fas fa-user';
-    }
-
-    // Check auth state on page load
-    function checkAuthState() {
-        const token = localStorage.getItem('token');
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        
-        if (token && isLoggedIn) {
-            loginButton.classList.add('logged-in');
-            loginButton.querySelector('i').className = 'fas fa-user-check';
+        if (messagesContainer) {
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     }
-
-    // Call on page load
-    checkAuthState();
 });
 
 // Add these functions to handle authentication
@@ -633,6 +761,7 @@ async function loginUser(email, password) {
 
         // Store token and user data
         localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username || data.user.email);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('isLoggedIn', 'true');
 
@@ -641,4 +770,88 @@ async function loginUser(email, password) {
         console.error('Login error:', error);
         throw error;
     }
+}
+
+.username-display {
+    margin-right: 10px;
+    font-weight: 500;
+    color: #333;
+}
+
+.top-right-login {
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.top-right-login i {
+    font-size: 20px;
+}
+
+.top-right-login:hover {
+    color: #ff4444;
+}
+
+.top-right-login.logged-in:hover {
+    color: #ff0000;
+}
+
+.login-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#loginForm button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#loginForm button:hover {
+    background-color: #45a049;
 }
