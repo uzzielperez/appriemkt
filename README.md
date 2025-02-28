@@ -172,6 +172,29 @@ Important security notes:
 * Consider setting up appropriate usage limits on your API keys.
 * Use separate API keys for development and production environments.
 
+# Authentication and Database 
+
+## Install Homebrew if you haven't already
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+## Install MongoDB
+brew tap mongodb/brew
+brew install mongodb-community
+
+## Start MongoDB service
+brew services start mongodb-community
+
+Add these to `server/`:
+```bash
+cd server
+npm install mongoose bcryptjs jsonwebtoken
+```
+
+## Create a .env file in the server directory
+```bash
+touch .env
+```
+
 # Contributing
 
 Clone: git clone <repo-url>
@@ -207,3 +230,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - OpenAI for GPT-4 API
 - Anthropic for Claude API
 - jsPDF for PDF generation
+

@@ -545,31 +545,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle login form submission
-    loginForm?.addEventListener('submit', (e) => {
+    loginForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = loginForm.querySelector('input[type="email"]').value;
         const password = loginForm.querySelector('input[type="password"]').value;
 
-        // Add your actual login logic here
-        console.log('Login attempt:', { email, feature: currentFeature });
+        try {
+            await loginUser(email, password);
+            
+            // Update UI
+            loginButton.classList.add('logged-in');
+            loginButton.querySelector('i').className = 'fas fa-user-check';
+            
+            // Close modal
+            loginModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
 
-        // For demo purposes, always "succeed"
-        isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        // Update UI
-        loginButton.classList.add('logged-in');
-        loginButton.querySelector('i').className = 'fas fa-user-check';
-        
-        // Close modal
-        loginModal.style.display = 'none';
-        modalOverlay.style.display = 'none';
+            // Clear form
+            loginForm.reset();
 
-        // Clear form
-        loginForm.reset();
-
-        // Handle the original feature request
-        handlePostLogin(currentFeature);
+            // Handle the original feature request
+            if (currentFeature) {
+                handlePostLogin(currentFeature);
+            }
+        } catch (error) {
+            alert(error.message);
+        }
     });
 
     function handlePostLogin(feature) {
@@ -587,4 +588,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     }
+
+    // Add logout functionality
+    function logoutUser() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('isLoggedIn');
+        
+        loginButton.classList.remove('logged-in');
+        loginButton.querySelector('i').className = 'fas fa-user';
+    }
+
+    // Check auth state on page load
+    function checkAuthState() {
+        const token = localStorage.getItem('token');
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        
+        if (token && isLoggedIn) {
+            loginButton.classList.add('logged-in');
+            loginButton.querySelector('i').className = 'fas fa-user-check';
+        }
+    }
+
+    // Call on page load
+    checkAuthState();
 });
+
+// Add these functions to handle authentication
+async function loginUser(email, password) {
+    try {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+
+        // Store token and user data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isLoggedIn', 'true');
+
+        return data;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
+    }
+}
