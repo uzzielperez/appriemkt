@@ -99,18 +99,31 @@
 
         .recommended {
             border: 2px solid var(--primary-color);
+            background: linear-gradient(135deg, white, teal, rgb(255, 234, 0));
+            /* background: linear-gradient(135deg, red, #ff7e5f, teal, blue); */
+            box-shadow: 0 0 20px rgba(255, 126, 95, 0.5);
         }
 
         .recommended-badge {
+            display: none;
+        }
+
+        .subscription-card.pro .recommended-badge {
+            display: block;
             position: absolute;
-            top: -12px;
-            right: -12px;
-            background: var(--primary-color);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
+            top: -10px;
+            right: -10px;
+            background-color: #ff7e5f;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .theme-toggle {
+            position: relative;
+            z-index: 5;
         }
 
         .tier-card h3 {
@@ -427,6 +440,134 @@
         .service-link:hover {
             background: var(--secondary-color);
         }
+
+        .service-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .service-icon i {
+            font-size: 4em;
+            color: var(--primary-color);
+        }
+
+        /* Add this new section for Donations */
+        .donation-section {
+            margin-top: 60px;
+            padding: 40px 20px;
+            #background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Fire effect gradient */
+            background: linear-gradient(135deg,yellow, #ff7e5f,teal, blue); /* Fire effect gradient */
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .donation-section h2 {
+            color: #fff; /* White text for contrast */
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .donation-section p {
+            color: #fff; /* White text for contrast */
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.5;
+        }
+
+        .donation-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #fff; /* White button for contrast */
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .donation-button:hover {
+            background: var(--secondary-color);
+            color: #fff;
+        }
+
+        body {
+            font-family: 'YourFontName', sans-serif; /* Replace with the font used in chat.html */
+            background-color: #000;
+            color: #fff;
+        }
+
+        .subscription-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px;
+        }
+
+        .subscription-card {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .subscription-card.pro {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            box-shadow: 0 0 20px rgba(255, 126, 95, 0.5);
+        }
+
+        .subscription-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        .get-started-button {
+            background-color: #000;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .get-started-button:hover {
+            background-color: #fff;
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -437,8 +578,9 @@
             </a>
         </div>
         <div class="nav-right">
-            <button id="darkModeToggle" class="dark-mode-toggle">
+            <button id="theme-toggle" class="theme-toggle">
                 <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
             </button>
         </div>
     </nav>
@@ -459,7 +601,6 @@
             </div>
 
             <div class="tier-card recommended">
-                <div class="recommended-badge">Recommended</div>
                 <h3>Professional</h3>
                 <div class="price">$19.99<span>/month</span></div>
                 <ul class="features-list">
@@ -596,7 +737,9 @@
             <h2>Recommended Health Services</h2>
             <div class="services-products">
                 <div class="service-product">
-                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Analytics+Suite" alt="Healthcare Analytics Suite">
+                    <div class="service-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
                     <div class="service-content">
                         <h3>Healthcare Analytics Suite</h3>
                         <p>Advanced analytics tools for healthcare professionals</p>
@@ -605,17 +748,20 @@
                 </div>
 
                 <div class="service-product">
-                    <!-- <img src="assets/img/products/medical-billing.png" alt="Medical Billing" -->
-                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Medical+Billing" alt="Medical Billing">
+                    <div class="service-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
                     <div class="service-content">
-                        <h3>Medical Billing</h3>
-                        <p>AI-assisted medical billing and coding</p>
+                        <h3>Medical Training Platform</h3>
+                        <p>Comprehensive medical training and certification</p>
                         <a href="#" class="service-link">Learn More</a>
                     </div>
                 </div>
 
                 <div class="service-product">
-                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Management+System" alt="Patient Management System">
+                    <div class="service-icon">
+                        <i class="fas fa-procedures"></i>
+                    </div>
                     <div class="service-content">
                         <h3>Patient Management System</h3>
                         <p>Streamline your patient care workflow</p>
@@ -623,6 +769,13 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Add this new section for Donations -->
+        <div class="donation-section">
+            <h2>Support Our Mission</h2>
+            <p>Help us improve patient-doctor communication for chronic diseases. Your donation will contribute to developing better tools and resources for healthcare professionals and patients.</p>
+            <a href="https://www.yourdonationlink.com" target="_blank" class="donation-button">Donate Now</a>
         </div>
     </div>
 
@@ -635,8 +788,9 @@
         });
 
         // Dark mode toggle functionality
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const moonIcon = darkModeToggle.querySelector('i');
+        const themeToggle = document.getElementById('theme-toggle');
+        const moonIcon = themeToggle.querySelector('i:nth-child(1)');
+        const sunIcon = themeToggle.querySelector('i:nth-child(2)');
         
         // Check for saved theme preference or default to light
         const savedTheme = localStorage.getItem('theme') || 'light';
@@ -644,7 +798,7 @@
         updateIcon(savedTheme);
 
         // Toggle dark mode
-        darkModeToggle.addEventListener('click', () => {
+        themeToggle.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
@@ -658,9 +812,13 @@
             if (theme === 'dark') {
                 moonIcon.classList.remove('fa-moon');
                 moonIcon.classList.add('fa-sun');
+                sunIcon.classList.remove('fa-sun');
+                sunIcon.classList.add('fa-moon');
             } else {
                 moonIcon.classList.remove('fa-sun');
                 moonIcon.classList.add('fa-moon');
+                sunIcon.classList.remove('fa-moon');
+                sunIcon.classList.add('fa-sun');
             }
         }
 
