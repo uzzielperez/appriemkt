@@ -8,11 +8,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         :root {
+            /* Light mode variables */
             --primary-color: #007AFF;
             --secondary-color: #0056b3;
             --background-color: #f0f2f5;
             --text-color: #333;
             --border-color: #e1e4e8;
+            --card-bg: white;
+            --nav-bg: white;
+        }
+
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #60a5fa;
+            --background-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #2d2d2d;
+            --card-bg: #2d2d2d;
+            --nav-bg: #2d2d2d;
         }
 
         body {
@@ -21,10 +35,11 @@
             margin: 0;
             padding: 0;
             color: var(--text-color);
+            transition: all 0.3s ease;
         }
 
         .navbar {
-            background-color: #fff;
+            background-color: var(--nav-bg);
             padding: 1rem 2rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: flex;
@@ -68,7 +83,7 @@
         }
 
         .tier-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 35px;
             width: 300px;
@@ -178,21 +193,6 @@
             padding: 20px;
         }
 
-        .affiliate-product {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .affiliate-product:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-
         .affiliate-product img {
             width: 100%;
             height: 200px;
@@ -200,34 +200,45 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        .affiliate-product {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .affiliate-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
         .affiliate-content {
             padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
         }
 
         .affiliate-content h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
             color: var(--text-color);
-            font-size: 1.2em;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .affiliate-content p {
             margin: 0 0 15px 0;
             color: #666;
-            flex-grow: 1;
             line-height: 1.5;
         }
 
         .affiliate-link {
-            align-self: flex-start;
-            padding: 10px 20px;
+            display: inline-block;
+            padding: 12px 24px;
             background: var(--primary-color);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
             font-weight: 500;
         }
 
@@ -241,6 +252,30 @@
             font-weight: 600;
             font-size: 1.2em;
             margin: 10px 0;
+        }
+
+        .dark-mode-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+            font-size: 1.2em;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: rgba(128, 128, 128, 0.2);
+        }
+
+        [data-theme="dark"] .dark-mode-toggle i {
+            color: #ffd700;
         }
 
         @media (max-width: 768px) {
@@ -258,18 +293,154 @@
             }
 
             .affiliate-products {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-                padding: 10px;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 25px;
             }
+        }
+
+        /* Dark mode specific adjustments */
+        [data-theme="dark"] .tier-card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        [data-theme="dark"] .affiliate-product {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        [data-theme="dark"] .back-button {
+            color: var(--primary-color);
+        }
+
+        [data-theme="dark"] .page-title {
+            color: var(--text-color);
+        }
+
+        .product-features {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        .product-features span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .product-features i {
+            color: var(--primary-color);
+        }
+
+        .product-badges {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        [data-theme="dark"] .badge {
+            opacity: 0.8;
+        }
+
+        /* Add this new section for Services */
+        .services-section {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .services-section h2 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 40px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .services-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .service-product {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .service-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .service-product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .service-content {
+            padding: 20px;
+        }
+
+        .service-content h3 {
+            margin: 0 0 12px 0;
+            color: var(--text-color);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .service-content p {
+            margin: 0 0 15px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .service-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .service-link:hover {
+            background: var(--secondary-color);
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <a href="chat.html" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Chat
-        </a>
+        <div class="nav-left">
+            <a href="chat.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Chat
+            </a>
+        </div>
+        <div class="nav-right">
+            <button id="darkModeToggle" class="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
     </nav>
 
     <div class="subscription-container">
@@ -318,7 +489,8 @@
             <h2>Recommended Health Tech Products</h2>
             <div class="affiliate-products">
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576515652031-fc429bbc4d31" alt="Smart Scale">
+                    <img src="assets/img/products/smart-scale.png" alt="Smart Scale"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Smart+Scale'">
                     <div class="affiliate-content">
                         <h3>Smart Health Scale</h3>
                         <p>Advanced body composition analysis with BMI, muscle mass, and body fat tracking</p>
@@ -328,7 +500,8 @@
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1579586337278-3befd40fd17a" alt="Health Watch">
+                    <img src="assets/img/products/health-watch.png" alt="Health Watch"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Health+Watch'">
                     <div class="affiliate-content">
                         <h3>Health Watch Pro</h3>
                         <p>24/7 heart rate monitoring, ECG, sleep tracking, and activity metrics</p>
@@ -338,27 +511,44 @@
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1510017803434-a899398421b3" alt="Fitness Tracker">
+                    <img src="assets/img/products/fitness-tracker.png" alt="Fitness Tracker"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Fitness+Tracker'">
                     <div class="affiliate-content">
                         <h3>Advanced Fitness Tracker</h3>
-                        <p>Complete activity monitoring with GPS and workout analytics</p>
+                        <p>Complete activity monitoring with GPS, heart rate tracking, and advanced workout analytics. Water-resistant design with extended battery life.</p>
                         <span class="price-tag">$129.99</span>
+                        <div class="product-features">
+                            <span><i class="fas fa-heartbeat"></i> Heart Rate</span>
+                            <span><i class="fas fa-running"></i> Activity</span>
+                            <span><i class="fas fa-map-marker-alt"></i> GPS</span>
+                        </div>
                         <a href="#" class="affiliate-link">View Details</a>
                     </div>
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="U-Scan Device">
+                    <img src="assets/img/products/u-scan-device.png" alt="U-Scan Device"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=U-Scan+Device'">
                     <div class="affiliate-content">
                         <h3>U-Scan Health Monitor</h3>
-                        <p>Advanced urinalysis device for home health monitoring</p>
+                        <p>Advanced home urinalysis device for comprehensive health monitoring. Track nutrition, metabolic efficiency, and reproductive health.</p>
                         <span class="price-tag">$199.99</span>
+                        <div class="product-features">
+                            <span><i class="fas fa-flask"></i> Analysis</span>
+                            <span><i class="fas fa-mobile-alt"></i> App</span>
+                            <span><i class="fas fa-chart-line"></i>Tracking</span>
+                        </div>
+                        <div class="product-badges">
+                            <span class="badge">FDA Registered</span>
+                            <span class="badge">CE Certified</span>
+                        </div>
                         <a href="#" class="affiliate-link">View Details</a>
                     </div>
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="BP Monitor">
+                    <img src="assets/img/products/bp-monitor.png" alt="BP Monitor"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=BP+Monitor'">
                     <div class="affiliate-content">
                         <h3>Smart Blood Pressure Monitor</h3>
                         <p>Wireless BP monitoring with trend analysis and doctor sharing</p>
@@ -368,7 +558,8 @@
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Sleep Sensor">
+                    <img src="assets/img/products/sleep-sensor.png" alt="Sleep Sensor"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Sleep+Sensor'">
                     <div class="affiliate-content">
                         <h3>Sleep Quality Sensor</h3>
                         <p>Advanced sleep tracking with detailed sleep stage analysis</p>
@@ -378,7 +569,8 @@
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Smart Thermometer">
+                    <img src="assets/img/products/smart-thermometer.png" alt="Smart Thermometer"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Smart+Thermometer'">
                     <div class="affiliate-content">
                         <h3>Smart Thermometer</h3>
                         <p>Wireless temperature monitoring with continuous tracking</p>
@@ -388,12 +580,46 @@
                 </div>
 
                 <div class="affiliate-product">
-                    <img src="https://images.unsplash.com/photo-1576671081837-49b1a991dd54" alt="Health Apps">
+                    <img src="assets/img/products/health-apps.png" alt="Health Apps"
+                         onerror="this.src='https://placehold.co/400x200/007AFF/FFFFFF?text=Health+Apps'">
                     <div class="affiliate-content">
                         <h3>Premium Health Apps Bundle</h3>
                         <p>Collection of top-rated health monitoring and tracking apps</p>
                         <span class="price-tag">$9.99/month</span>
                         <a href="#" class="affiliate-link">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="services-section">
+            <h2>Recommended Health Services</h2>
+            <div class="services-products">
+                <div class="service-product">
+                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Analytics+Suite" alt="Healthcare Analytics Suite">
+                    <div class="service-content">
+                        <h3>Healthcare Analytics Suite</h3>
+                        <p>Advanced analytics tools for healthcare professionals</p>
+                        <a href="#" class="service-link">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="service-product">
+                    <!-- <img src="assets/img/products/medical-billing.png" alt="Medical Billing" -->
+                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Medical+Billing" alt="Medical Billing">
+                    <div class="service-content">
+                        <h3>Medical Billing</h3>
+                        <p>AI-assisted medical billing and coding</p>
+                        <a href="#" class="service-link">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="service-product">
+                    <img src="https://placehold.co/400x200/007AFF/FFFFFF?text=Management+System" alt="Patient Management System">
+                    <div class="service-content">
+                        <h3>Patient Management System</h3>
+                        <p>Streamline your patient care workflow</p>
+                        <a href="#" class="service-link">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -406,6 +632,44 @@
                 const tier = this.parentElement.querySelector('h3').textContent;
                 alert(`Thank you for choosing the ${tier} plan! We'll process your subscription shortly.`);
             });
+        });
+
+        // Dark mode toggle functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const moonIcon = darkModeToggle.querySelector('i');
+        
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        // Update moon/sun icon
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                moonIcon.classList.remove('fa-moon');
+                moonIcon.classList.add('fa-sun');
+            } else {
+                moonIcon.classList.remove('fa-sun');
+                moonIcon.classList.add('fa-moon');
+            }
+        }
+
+        // Optional: Sync with system preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
         });
     </script>
 </body>
