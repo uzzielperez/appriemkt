@@ -11,14 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jspdf": "^3.0.0",
     "multer": "^1.4.5-lts.1",
-    "openai": "^4.85.4",
-    "stripe": "^17.6.0"
+    "openai": "^4.85.4"
   },
-  "description": ""
+  "description": "Try registering a new user::\r ```bash\r  curl -X POST http://localhost:3000/api/auth/register \\\r ∙ -H \"Content-Type: application/json\" \\\r ∙ -d '{\"email\":\"test@example.com\",\"password\":\"password123\",\"name\":\"Test User\"}'\r <!DOCTYPE html>\r <html lang=\"en\">\r <head>\r <meta charset=\"utf-8\">\r <title>Error</title>\r </head>\r <body>\r <pre>Cannot POST /api/auth/register</pre>\r </body>\r </html>\r ```",
+  "devDependencies": {}
 }
