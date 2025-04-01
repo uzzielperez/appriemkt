@@ -64,7 +64,10 @@ npm install express axios stripe multer dotenv
    npm install
    npm init -y
    ```  
-
+   ```bash
+   npm install express axios stripe multer dotenv groq
+   ```
+   - Ensure `package.json` and `package-lock.json` are present.
 ## Runing Locally
 
 1. **Backend**:

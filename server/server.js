@@ -4,6 +4,8 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const OpenAI = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
+// Import the DeepSeek service we created
+const deepseekService = require('./services/deepseekService');
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +27,14 @@ if (!process.env.OPENAI_API_KEY) {
     console.error('OPENAI_API_KEY is not set in .env file');
 }
 
+if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not set in .env file');
+}
+
+if (!process.env.DEEPSEEK_API_KEY) {
+    console.error('DEEPSEEK_API_KEY is not set in .env file');
+}
+
 // Initialize API clients
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
@@ -33,6 +43,21 @@ const openai = new OpenAI({
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
 });
+
+// DeepSeek is initialized in the deepseekService module
+
+// Log available models
+console.log('Available AI models:', {
+    openai: !!process.env.OPENAI_API_KEY,
+    anthropic: !!process.env.ANTHROPIC_API_KEY,
+    deepseek: !!process.env.DEEPSEEK_API_KEY
+});
+
+// Import routes
+const aiRoutes = require('./routes/aiRoutes');
+
+// Register routes
+app.use('/api/ai', aiRoutes);
 
 // Test endpoint
 app.get('/test', (req, res) => {
@@ -116,6 +141,24 @@ app.post('/api/query', upload.none(), async (req, res) => {
                 console.error('Anthropic API Error:', anthropicError);
                 throw new Error(`Anthropic API Error: ${anthropicError.message}`);
             }
+        } else if (model === 'deepseek') {
+            try {
+                // Use the DeepSeek service we created
+                const deepseekResponse = await deepseekService.generateText(prompt, {
+                    maxTokens: 1000,
+                    temperature: 0.7
+                });
+                
+                // Adjust this based on the actual response structure from DeepSeek
+                response = {
+                    response: deepseekResponse.choices?.[0]?.text || deepseekResponse.completion || "No response from DeepSeek",
+                    tokens: deepseekResponse.usage?.total_tokens || 0,
+                    cost: (deepseekResponse.usage?.total_tokens || 0) * 0.00002 // Adjust cost as needed
+                };
+            } catch (deepseekError) {
+                console.error('DeepSeek API Error:', deepseekError);
+                throw new Error(`DeepSeek API Error: ${deepseekError.message}`);
+            }
         } else {
             throw new Error('Invalid model specified');
         }
@@ -133,6 +176,67 @@ app.post('/api/query', upload.none(), async (req, res) => {
             details: error.stack
         });
     }
+});
+
+// Example route handler for AI processing
+app.post('/api/process', upload.single('file'), async (req, res) => {
+  try {
+    const { task, model, query } = req.body;
+    const queryLength = query ? query.length : 0;
+    
+    console.log('Received request:', { task, model, queryLength });
+    
+    // Validate model
+    console.log('Using model:', model);
+    console.log('Task:', task);
+    
+    if (!['anthropic', 'openai', 'deepseek'].includes(model)) {
+      throw new Error('Invalid model specified');
+    }
+    
+    let response;
+    
+    // Process based on selected model
+    if (model === 'anthropic') {
+      // Existing Anthropic code
+      response = await anthropic.messages.create({
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 4000,
+        messages: [{ role: "user", content: query }]
+      });
+    } else if (model === 'openai') {
+      // Existing OpenAI code
+      response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [{ role: "user", content: query }]
+      });
+    } else if (model === 'deepseek') {
+      // New DeepSeek code
+      response = await deepseekService.generateText(query);
+    }
+    
+    res.json({ response });
+  } catch (error) {
+    console.error('Error processing request:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add this route to test DeepSeek API directly
+app.get('/test-deepseek', async (req, res) => {
+  try {
+    console.log('Testing DeepSeek API...');
+    const deepseekService = require('./services/deepseekService');
+    const response = await deepseekService.generateText('Hello, this is a test prompt.');
+    res.json({ success: true, response });
+  } catch (error) {
+    console.error('Test failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      details: error.response?.data || error.stack
+    });
+  }
 });
 
 // Update the port to 3000
