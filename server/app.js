@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config();
 
-// Fix the fetch import
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // Add function to test Groq connection and get available models
@@ -88,7 +87,7 @@ app.get('/api/models', async (req, res) => {
   }
 });
 
-// Debug middleware with more detailed logging
+// Debug middleware
 app.use((req, res, next) => {
   console.log('\n=== Incoming Request ===');
   console.log('Method:', req.method);
@@ -101,7 +100,7 @@ app.use((req, res, next) => {
 // API endpoint for handling queries
 app.post('/api/query', async (req, res) => {
   try {
-    const { query, model = 'groq', task = 'clinical' } = req.body;
+    const { query, model, task } = req.body;
     console.log('Processing query:', query);
     console.log('Selected model:', model);
     console.log('Current task:', task);
@@ -110,48 +109,42 @@ app.post('/api/query', async (req, res) => {
       throw new Error('Query is required');
     }
 
-    const selectedModel = model || 'groq';
+    console.log('Making Groq API request...');
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model || 'mixtral-8x7b',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful medical AI assistant. Provide accurate, evidence-based medical information.'
+          },
+          {
+            role: 'user',
+            content: query
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2048,
+      }),
+    });
 
-    if (selectedModel === 'groq') {
-      console.log('Making Groq API request...');
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'qwen-qwq-32b', // Updated to use Qwen model
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful medical AI assistant. Provide accurate, evidence-based medical information.'
-            },
-            {
-              role: 'user',
-              content: query
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2048,
-        }),
-      });
+    const responseText = await response.text();
+    console.log('Groq API response:', responseText);
 
-      const responseText = await response.text();
-      console.log('Groq API response:', responseText);
-
-      if (!response.ok) {
-        throw new Error(`Groq API error: ${response.status} - ${responseText}`);
-      }
-
-      const data = JSON.parse(responseText);
-      res.json({
-        response: data.choices[0].message.content,
-        model: 'groq'
-      });
-    } else {
-      throw new Error(`Unsupported model: ${selectedModel}`);
+    if (!response.ok) {
+      throw new Error(`Groq API error: ${response.status} - ${responseText}`);
     }
+
+    const data = JSON.parse(responseText);
+    res.json({
+      response: data.choices[0].message.content,
+      model: model
+    });
   } catch (error) {
     console.error('Error processing query:', error);
     res.status(500).json({
