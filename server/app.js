@@ -87,6 +87,28 @@ app.get('/api/models', async (req, res) => {
   }
 });
 
+// Add endpoint to get available models
+app.get('/api/available-models', async (req, res) => {
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const models = await response.json();
+    res.json(models);
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Debug middleware
 app.use((req, res, next) => {
   console.log('\n=== Incoming Request ===');
