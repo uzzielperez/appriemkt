@@ -15,6 +15,24 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
+        <style>
+            .model-selector {
+                background-color: rgba(80, 80, 80, 0.3);
+                color: var(--text-color);
+                border: none;
+                padding: 5px 10px;
+                border-radius: 20px;
+                cursor: pointer;
+                outline: none;
+                font-size: 14px;
+            }
+
+            .model-selector option {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                padding: 5px;
+            }
+        </style>
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -398,10 +416,8 @@
                     <button id="voice-btn" class="btn btn-secondary mb-2">Voice</button>
                     <button id="deep-search-btn" class="btn btn-info mb-2">Deep Search</button>
                     <button id="subscribe-btn" class="btn btn-success mb-2">Subscribe</button>
-                    <select id="backend-select" class="form-control mb-2">
-                        <option value="heroku">Heroku</option>
-                        <option value="aws">AWS</option>
-                        <option value="local">Local</option>
+                    <select id="model-select" class="model-selector">
+                        <option value="" disabled selected>Loading Groq models...</option>
                     </select>
                     <div id="token-usage" class="text-muted"></div>
                 </div>
