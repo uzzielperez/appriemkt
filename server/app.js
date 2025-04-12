@@ -61,8 +61,28 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add custom Content-Security-Policy middleware
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy', 
+    "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+  );
+  next();
+});
+
+// Create public directory if it doesn't exist
+const publicDir = path.join(__dirname, 'public');
+const fs = require('fs');
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+  console.log('Created public directory:', publicDir);
+}
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Also serve static files from the root directory
+app.use(express.static(path.join(__dirname, '../')));
 
 // Add startup checks
 console.log('\n=== GROQ API Configuration ===');
