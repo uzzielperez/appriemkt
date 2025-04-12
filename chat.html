@@ -438,6 +438,21 @@
         .back-button:hover {
             text-decoration: underline;
         }
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .settings-item.active {
+            background: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -499,13 +514,21 @@
                 <img src="apprie-logo.png" alt="Apprie Logo" class="chat-logo">
                 <h2>Apprie Medical AI</h2>
             </div>
-            <button class="close-chat" id="close-chat">&times;</button>
+            <div class="action-buttons">
+                <div class="settings-item privacy-toggle">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <button class="download-pdf-button" style="display: none;">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+                <button class="close-chat" id="close-chat">&times;</button>
+            </div>
         </div>
         <div class="task-bar">
-            <button class="task-button active">General</button>
-            <button class="task-button">Symptoms</button>
-            <button class="task-button">Treatment</button>
-            <button class="task-button">Report</button>
+            <button class="task-button" data-task="general">General</button>
+            <button class="task-button" data-task="symptoms">Symptoms</button>
+            <button class="task-button" data-task="treatment">Treatment</button>
+            <button class="task-button" data-task="report">Report</button>
         </div>
         <div class="messages-container" id="modal-messages">
             <!-- Modal messages will be added here -->
@@ -532,50 +555,123 @@
             // Initialize the chat interface
             const searchInput = document.querySelector('.search-input');
             const submitButton = document.querySelector('.submit-button');
+            const chatModal = document.getElementById('chat-modal');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const closeChat = document.querySelector('.close-chat');
+            const chatInput = document.querySelector('.chat-input');
+            const chatSendButton = document.querySelector('.chat-send-button');
             const messagesContainer = document.getElementById('messages-container');
+            const modalMessages = document.getElementById('modal-messages');
             const modelSelect = document.getElementById('model-select');
-            const categories = document.querySelectorAll('.category');
-            const promptCards = document.querySelectorAll('.prompt-card');
+            const taskButtons = document.querySelectorAll('.task-button');
+            const downloadPdfButton = document.querySelector('.download-pdf-button');
+            const privacyToggle = document.querySelector('.privacy-toggle');
             
-            // Set active category
-            categories.forEach(category => {
-                category.addEventListener('click', function() {
-                    categories.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
+            let currentTask = 'symptoms';
+            let isPrivacyMode = localStorage.getItem('privacyMode') === 'true';
+            
+            // Set initial privacy state
+            if (isPrivacyMode && privacyToggle) {
+                privacyToggle.classList.add('active');
+                const icon = privacyToggle.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-eye-slash';
+                }
+            }
+            
+            // Initialize first task button as active
+            if (taskButtons.length > 0) {
+                taskButtons[0].classList.add('active');
+            }
+            
+            // Auto-resize textareas
+            [searchInput, chatInput].forEach(textarea => {
+                if (textarea) {
+                    textarea.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = (this.scrollHeight) + 'px';
+                    });
+                }
+            });
+            
+            // Show modal and overlay
+            function showChat() {
+                modalOverlay.style.display = 'block';
+                chatModal.style.display = 'flex';
+            }
+            
+            // Hide modal and overlay
+            function hideChat() {
+                modalOverlay.style.display = 'none';
+                chatModal.style.display = 'none';
+            }
+            
+            // Task button handlers
+            taskButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    taskButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    currentTask = button.dataset.task;
+                    
+                    if (currentTask === 'report') {
+                        downloadPdfButton.style.display = 'block';
+                    } else {
+                        downloadPdfButton.style.display = 'none';
+                    }
                 });
             });
             
-            // Fill prompt from suggestion cards
-            promptCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const promptText = this.querySelector('.prompt-text').textContent;
-                    searchInput.value = promptText;
-                    searchInput.focus();
+            // Privacy toggle
+            if (privacyToggle) {
+                privacyToggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    
+                    if (this.classList.contains('active')) {
+                        isPrivacyMode = true;
+                        if (icon) icon.className = 'fas fa-eye-slash';
+                    } else {
+                        isPrivacyMode = false;
+                        if (icon) icon.className = 'fas fa-eye';
+                    }
+                    
+                    localStorage.setItem('privacyMode', isPrivacyMode);
+                    applyPrivacyToExistingMessages();
                 });
-            });
+            }
             
-            // Submit query
+            function applyPrivacyToExistingMessages() {
+                const messages = document.querySelectorAll('.message');
+                messages.forEach(msg => {
+                    if (isPrivacyMode) {
+                        msg.classList.add('private');
+                    } else {
+                        msg.classList.remove('private');
+                    }
+                });
+            }
+            
+            // Submit button handler
             submitButton.addEventListener('click', function() {
                 const query = searchInput.value.trim();
                 if (query) {
-                    // Add user message
-                    addMessage(query, 'user');
+                    // Show chat modal
+                    showChat();
+                    
+                    // Add user message to modal
+                    addMessage(query, true, modalMessages);
                     
                     // Show loading message
-                    const loadingId = addMessage('Generating response...', 'assistant loading');
-                    
-                    // Get selected model and category
-                    const model = modelSelect.value;
-                    const category = document.querySelector('.category.active').textContent.toLowerCase();
+                    const loadingId = addLoadingMessage(modalMessages);
                     
                     // Simulate API call (replace with actual API call)
                     setTimeout(() => {
                         // Remove loading message
-                        const loadingMsg = document.getElementById(loadingId);
-                        if (loadingMsg) loadingMsg.remove();
+                        removeLoadingMessage(loadingId);
                         
                         // Add AI response
-                        addMessage('This is a simulated response from the AI. In a real implementation, this would be replaced with the actual response from the Groq API based on the user query.', 'assistant');
+                        const response = "This is a simulated response from the Groq API. In a real implementation, this would be replaced with the actual response based on your query about: " + query;
+                        addMessage(response, false, modalMessages);
                         
                         // Clear input
                         searchInput.value = '';
@@ -583,25 +679,111 @@
                 }
             });
             
-            // Add message to container
-            function addMessage(text, type) {
-                const messageId = 'msg-' + Date.now();
-                const messageDiv = document.createElement('div');
-                messageDiv.id = messageId;
-                messageDiv.className = `message ${type}`;
-                messageDiv.textContent = text;
-                messagesContainer.appendChild(messageDiv);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                return messageId;
-            }
-            
-            // Handle Enter key in textarea
-            searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    submitButton.click();
+            // Chat send button handler
+            chatSendButton.addEventListener('click', function() {
+                const query = chatInput.value.trim();
+                if (query) {
+                    // Add user message
+                    addMessage(query, true, modalMessages);
+                    
+                    // Show loading message
+                    const loadingId = addLoadingMessage(modalMessages);
+                    
+                    // Simulate API call (replace with actual API call)
+                    setTimeout(() => {
+                        // Remove loading message
+                        removeLoadingMessage(loadingId);
+                        
+                        // Add AI response
+                        const response = "This is a simulated response from the Groq API. In a real implementation, this would be replaced with the actual response based on your query about: " + query;
+                        addMessage(response, false, modalMessages);
+                        
+                        // Clear input
+                        chatInput.value = '';
+                    }, 2000);
                 }
             });
+            
+            // Close chat button handler
+            closeChat.addEventListener('click', hideChat);
+            
+            // Close modal when clicking overlay
+            modalOverlay.addEventListener('click', hideChat);
+            
+            // Add message to container
+            function addMessage(content, isUser, container) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+                if (isPrivacyMode) {
+                    messageDiv.classList.add('private');
+                }
+                messageDiv.textContent = content;
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+                return messageDiv.id;
+            }
+            
+            function addLoadingMessage(container) {
+                const loadingDiv = document.createElement('div');
+                const id = 'loading-' + Date.now();
+                loadingDiv.id = id;
+                loadingDiv.className = 'message assistant loading';
+                loadingDiv.textContent = 'Thinking...';
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+                return id;
+            }
+            
+            function removeLoadingMessage(id) {
+                const loadingDiv = document.getElementById(id);
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+            
+            // Category selection
+            const categories = document.querySelectorAll('.category');
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Suggested prompts
+            const promptCards = document.querySelectorAll('.prompt-card');
+            promptCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const promptText = this.querySelector('.prompt-text').textContent;
+                    searchInput.value = promptText;
+                    searchInput.style.height = 'auto';
+                    searchInput.style.height = (searchInput.scrollHeight) + 'px';
+                    searchInput.focus();
+                });
+            });
+            
+            // Handle Enter key in textareas
+            [searchInput, chatInput].forEach(textarea => {
+                if (textarea) {
+                    textarea.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (textarea === searchInput) {
+                                submitButton.click();
+                            } else if (textarea === chatInput) {
+                                chatSendButton.click();
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Download PDF button handler
+            if (downloadPdfButton) {
+                downloadPdfButton.addEventListener('click', function() {
+                    alert('PDF generation would happen here in a real implementation.');
+                });
+            }
         });
     </script>
 </body>
