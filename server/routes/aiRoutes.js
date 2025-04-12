@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const aiController = require('../controllers/aiController');
 
-// DeepSeek route
-router.post('/deepseek/generate', aiController.generateDeepSeekResponse);
+// Groq route
+router.post('/groq/generate', aiController.generateGroqResponse);
 
-module.exports = router; 
+module.exports = router;

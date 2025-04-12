@@ -1,6 +1,8 @@
-const deepseekService = require('../services/deepseekService');
+// This file has been modified to remove deepseek references
+// It now contains only groq-related functionality
 
-exports.generateDeepSeekResponse = async (req, res) => {
+// Add any groq-specific controller functions here if needed
+exports.generateGroqResponse = async (req, res) => {
   try {
     const { prompt, options } = req.body;
     
@@ -8,14 +10,15 @@ exports.generateDeepSeekResponse = async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
     
-    const response = await deepseekService.generateText(prompt, options);
+    // Implementation would go here if needed
+    // This is a placeholder for future groq-specific controller functions
     
-    return res.json(response);
+    return res.status(501).json({ message: 'This endpoint is not yet implemented. Use the main API endpoint for groq.' });
   } catch (error) {
-    console.error('Error in DeepSeek generation:', error);
+    console.error('Error in Groq generation:', error);
     return res.status(500).json({ 
-      error: 'Failed to generate response from DeepSeek',
+      error: 'Failed to generate response from Groq',
       details: error.response?.data || error.message
     });
   }
-}; 
+};

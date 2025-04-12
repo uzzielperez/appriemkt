@@ -67,43 +67,6 @@ app.post('/api/query', async (req, res) => {
         model: 'groq'
       });
     } 
-    else if (model === 'deepseek') {
-      response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful medical AI assistant. Provide accurate, evidence-based medical information.'
-            },
-            {
-              role: 'user',
-              content: query
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2048,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log('DeepSeek API response:', data);
-      
-      res.json({
-        response: data.choices[0].message.content,
-        model: 'deepseek'
-      });
-    }
     else {
       throw new Error(`Unsupported model: ${model}`);
     }
@@ -136,7 +99,6 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log('Environment:', process.env.NODE_ENV || 'development');
   console.log('GROQ API Key present:', !!process.env.GROQ_API_KEY);
-  console.log('DeepSeek API Key present:', !!process.env.DEEPSEEK_API_KEY);
 });
 
 module.exports = app;

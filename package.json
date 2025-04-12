@@ -3,13 +3,14 @@
     "version": "1.0.0",
     "description": "Chat app with multiple AI model support",
     "dependencies": {
-        "@anthropic-ai/sdk": "^0.10.0",
+        "@anthropic-ai/sdk": "^0.10.2",
         "body-parser": "^2.2.0",
         "cors": "^2.8.5",
-        "dotenv": "^16.4.7",
+        "dotenv": "^16.5.0",
         "express": "^5.1.0",
+        "multer": "^1.4.5-lts.2",
         "node-fetch": "^3.3.2",
-        "openai": "^4.24.1",
+        "openai": "^4.93.0",
         "path": "^0.12.7"
     }
 }
