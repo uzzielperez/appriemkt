@@ -3,6 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // Load environment variables
@@ -11,11 +12,12 @@ dotenv.config();
 const app = express();
 const upload = multer();
 
-// Add custom Content-Security-Policy middleware
+// Apply CSP headers to all responses
 app.use((req, res, next) => {
+  // Set a permissive Content-Security-Policy that allows images, scripts, and styles
   res.setHeader(
     'Content-Security-Policy', 
-    "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+    "default-src 'self'; img-src 'self' data: *; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;"
   );
   next();
 });
@@ -51,9 +53,24 @@ const aiRoutes = require('./routes/aiRoutes');
 // Register routes
 app.use('/api/ai', aiRoutes);
 
-// Direct favicon serving route
+// Direct favicon serving route with explicit headers
 app.get('/favicon.ico', (req, res) => {
+    // Explicitly set CSP header for favicon requests
+    res.setHeader(
+      'Content-Security-Policy', 
+      "default-src 'self'; img-src 'self' data: *;"
+    );
     res.sendFile(path.join(__dirname, '../assets/favicon.ico'));
+});
+
+// Handle chat.html route explicitly
+app.get('/chat.html', (req, res) => {
+    // Explicitly set CSP header for chat.html
+    res.setHeader(
+      'Content-Security-Policy', 
+      "default-src 'self'; img-src 'self' data: *; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;"
+    );
+    res.sendFile(path.join(__dirname, '../chat.html'));
 });
 
 // Test endpoint
@@ -264,6 +281,16 @@ app.get('/test-groq', async (req, res) => {
       details: error.response?.data || error.stack
     });
   }
+});
+
+// Catch-all route for HTML files to ensure CSP headers are applied
+app.get('*.html', (req, res, next) => {
+  // Explicitly set CSP header for all HTML files
+  res.setHeader(
+    'Content-Security-Policy', 
+    "default-src 'self'; img-src 'self' data: *; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;"
+  );
+  next();
 });
 
 // Update the port to 3000
