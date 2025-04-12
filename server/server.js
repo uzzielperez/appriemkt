@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const dotenv = require('dotenv');
+const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // Load environment variables
@@ -9,6 +10,21 @@ dotenv.config();
 
 const app = express();
 const upload = multer();
+
+// Add custom Content-Security-Policy middleware
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy', 
+    "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+  );
+  next();
+});
+
+// Serve static files from the assets directory (where favicon.ico is located)
+app.use(express.static(path.join(__dirname, '../assets')));
+
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname, '../')));
 
 // Update CORS configuration
 app.use(cors({
@@ -34,6 +50,11 @@ const aiRoutes = require('./routes/aiRoutes');
 
 // Register routes
 app.use('/api/ai', aiRoutes);
+
+// Direct favicon serving route
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, '../assets/favicon.ico'));
+});
 
 // Test endpoint
 app.get('/test', (req, res) => {
