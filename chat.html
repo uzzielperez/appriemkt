@@ -720,7 +720,7 @@
                     const modelName = modelSelect.value;
                     
                     // Make API call
-                    fetch('/api/query', {
+                    fetch('/.netlify/functions/groq', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -775,7 +775,7 @@
                     const modelName = modelSelect.value;
                     
                     // Make API call
-                    fetch('/api/query', {
+                    fetch('/.netlify/functions/groq', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -918,7 +918,7 @@
                         let imageLoaded = false;
                         
                         // Set the source to the triangular logo
-                        img.src = '../assets/img/triangular-logo.png';
+                        img.src = 'assets/img/triangular-logo.png';
                         
                         // Set a timeout in case image loading takes too long
                         const imageTimeout = setTimeout(() => {
