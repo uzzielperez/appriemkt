@@ -854,11 +854,22 @@
             // PDF download button handler
             if (downloadPdfButton) {
                 downloadPdfButton.addEventListener('click', function() {
-                    if (window.jspdf) {
+                    console.log("PDF download button clicked");
+                    
+                    if (!window.jspdf) {
+                        console.error("jsPDF library not loaded");
+                        alert("PDF generation library not loaded. Please try again later.");
+                        return;
+                    }
+                    
+                    try {
                         const { jsPDF } = window.jspdf;
+                        console.log("jsPDF initialized");
                         
                         // Get all AI messages in the modal
                         const aiMessages = modalMessages.querySelectorAll('.message.assistant:not(.loading)');
+                        console.log("Found AI messages:", aiMessages.length);
+                        
                         if (aiMessages.length === 0) {
                             alert('No content to download. Please generate a report first.');
                             return;
@@ -867,30 +878,24 @@
                         // Get the most recent AI message
                         const latestMessage = aiMessages[aiMessages.length - 1];
                         const content = latestMessage.textContent;
+                        console.log("Content length:", content.length);
                         
                         // Create PDF instance
                         const doc = new jsPDF();
+                        console.log("PDF document created");
                         
-                        // Load the Apprie logo
-                        const img = new Image();
-                        img.onload = function() {
-                            // Calculate aspect ratio to maintain proportions
-                            const imgWidth = 30;
-                            const imgHeight = (img.height * imgWidth) / img.width;
-                            
-                            // Add logo centered at the top
-                            doc.addImage(this, 'PNG', (doc.internal.pageSize.width - imgWidth) / 2, 10, imgWidth, imgHeight);
-                            
+                        // Function to generate PDF without image if needed
+                        function generatePDFWithoutImage() {
                             // Add title
                             doc.setFontSize(16);
                             doc.setTextColor(0, 51, 102);
-                            doc.text('Medical Report', 105, 35, { align: 'center' });
+                            doc.text('Medical Report', 105, 20, { align: 'center' });
                             
                             // Add date
                             doc.setFontSize(10);
                             doc.setTextColor(100);
                             const date = new Date().toLocaleDateString();
-                            doc.text(`Generated on ${date}`, 105, 45, { align: 'center' });
+                            doc.text(`Generated on ${date}`, 105, 30, { align: 'center' });
                             
                             // Add content
                             doc.setFontSize(12);
@@ -898,12 +903,81 @@
                             
                             // Split text into lines to fit the page
                             const splitText = doc.splitTextToSize(content, 180);
-                            doc.text(splitText, 15, 60);
+                            doc.text(splitText, 15, 45);
                             
                             // Save the PDF
                             doc.save('medical-report.pdf');
+                            console.log("PDF saved without image");
+                        }
+                        
+                        // Load the triangular logo
+                        console.log("Loading triangular logo for PDF");
+                        
+                        // Instead of using a data URL, let's directly load the asset
+                        const img = new Image();
+                        let imageLoaded = false;
+                        
+                        // Set the source to the triangular logo
+                        img.src = '../assets/img/triangular-logo.png';
+                        
+                        // Set a timeout in case image loading takes too long
+                        const imageTimeout = setTimeout(() => {
+                            if (!imageLoaded) {
+                                console.log("Image loading timed out, generating PDF without image");
+                                generatePDFWithoutImage();
+                            }
+                        }, 3000);
+                        
+                        img.onload = function() {
+                            imageLoaded = true;
+                            clearTimeout(imageTimeout);
+                            console.log("Logo image loaded");
+                            
+                            try {
+                                // Calculate aspect ratio to maintain proportions
+                                const imgWidth = 10;
+                                const imgHeight = 10; // SVG is square
+                                
+                                // Add logo right next to the "Medical Report" heading (left side of centered text)
+                                doc.addImage(img, 'PNG', 75, 18, imgWidth, imgHeight);
+                                
+                                // Rest of the PDF generation code
+                                doc.setFontSize(16);
+                                doc.setTextColor(0, 51, 102);
+                                doc.text('Medical Report', 105, 25, { align: 'center' });
+                                
+                                // Add date
+                                doc.setFontSize(10);
+                                doc.setTextColor(100);
+                                const date = new Date().toLocaleDateString();
+                                doc.text(`Generated on ${date}`, 105, 35, { align: 'center' });
+                                
+                                // Add content
+                                doc.setFontSize(12);
+                                doc.setTextColor(0);
+                                
+                                // Split text into lines to fit the page
+                                const splitText = doc.splitTextToSize(content, 180);
+                                doc.text(splitText, 15, 50);
+                                
+                                // Save the PDF
+                                doc.save('medical-report.pdf');
+                                console.log("PDF saved with image");
+                            } catch (err) {
+                                console.error("Error in image processing:", err);
+                                generatePDFWithoutImage();
+                            }
                         };
-                        img.src = 'assets/img/fingerprint-icon.svg';
+                        
+                        img.onerror = function(err) {
+                            imageLoaded = true;
+                            clearTimeout(imageTimeout);
+                            console.error("Error loading logo from data URL:", err);
+                            generatePDFWithoutImage();
+                        };
+                    } catch (err) {
+                        console.error("Error generating PDF:", err);
+                        alert("Error generating PDF: " + err.message);
                     }
                 });
             }
