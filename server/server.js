@@ -9,6 +9,8 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 // Load environment variables
 dotenv.config();
 
+const { getAvailableModels } = require('./app');
+
 const app = express();
 const upload = multer();
 
@@ -124,14 +126,14 @@ app.post('/api/query', upload.none(), async (req, res) => {
         let response;
         if (model === 'groq') {
             try {
-                const groqResponse = await fetch('https://api.groq.com/v1/chat/completions', {
+                const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'mixtral-8x7b-32768',
+                        model: 'allam-2-7b',
                         messages: [
                             {
                                 role: 'system',
@@ -201,14 +203,14 @@ app.post('/api/process', upload.single('file'), async (req, res) => {
     let response;
     
     // Process based on selected model
-    const groqResponse = await fetch('https://api.groq.com/v1/chat/completions', {
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: 'allam-2-7b',
         messages: [
           {
             role: 'system',
@@ -243,14 +245,14 @@ app.post('/api/process', upload.single('file'), async (req, res) => {
 app.get('/test-groq', async (req, res) => {
   try {
     console.log('Testing Groq API...');
-    const response = await fetch('https://api.groq.com/v1/chat/completions', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: 'allam-2-7b',
         messages: [
           {
             role: 'system',
@@ -295,6 +297,10 @@ app.get('*.html', (req, res, next) => {
 
 // Update the port to 3000
 const PORT = process.env.PORT || 3000;
+(async () => {
+  console.log("=== Fetching Available Models ===");
+  await getAvailableModels();
+})();
 app.listen(PORT, () => {
     console.log(`\nServer running on port ${PORT}`);
     console.log(`http://localhost:${PORT}\n`);

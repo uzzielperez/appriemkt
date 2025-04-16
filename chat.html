@@ -664,18 +664,42 @@
                     // Show loading message
                     const loadingId = addLoadingMessage(modalMessages);
                     
-                    // Simulate API call (replace with actual API call)
-                    setTimeout(() => {
+                    // Make actual API call to the server
+                    fetch('/api/query', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            query: query,
+                            model: 'groq',
+                            task: 'symptoms'  // Default task
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
                         // Remove loading message
                         removeLoadingMessage(loadingId);
                         
                         // Add AI response
-                        const response = "This is a simulated response from the Groq API. In a real implementation, this would be replaced with the actual response based on your query about: " + query;
-                        addMessage(response, false, modalMessages);
+                        addMessage(data.response, false, modalMessages);
                         
                         // Clear input
                         searchInput.value = '';
-                    }, 2000);
+                    })
+                    .catch(error => {
+                        // Remove loading message
+                        removeLoadingMessage(loadingId);
+                        
+                        // Add error message
+                        addMessage('Error: ' + error.message, false, modalMessages);
+                        console.error('Error:', error);
+                    });
                 }
             });
             
@@ -689,18 +713,42 @@
                     // Show loading message
                     const loadingId = addLoadingMessage(modalMessages);
                     
-                    // Simulate API call (replace with actual API call)
-                    setTimeout(() => {
+                    // Make actual API call to the server
+                    fetch('/api/query', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            query: query,
+                            model: 'groq',
+                            task: 'symptoms'  // Default task
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
                         // Remove loading message
                         removeLoadingMessage(loadingId);
                         
                         // Add AI response
-                        const response = "This is a simulated response from the Groq API. In a real implementation, this would be replaced with the actual response based on your query about: " + query;
-                        addMessage(response, false, modalMessages);
+                        addMessage(data.response, false, modalMessages);
                         
                         // Clear input
                         chatInput.value = '';
-                    }, 2000);
+                    })
+                    .catch(error => {
+                        // Remove loading message
+                        removeLoadingMessage(loadingId);
+                        
+                        // Add error message
+                        addMessage('Error: ' + error.message, false, modalMessages);
+                        console.error('Error:', error);
+                    });
                 }
             });
             
