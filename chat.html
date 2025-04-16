@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #0a0a0a;
@@ -457,7 +458,7 @@
 </head>
 <body>
     <div class="logo-container">
-        <img src="apprie-logo.png" alt="Apprie Logo" class="logo">
+        <img src="assets/img/apprie-logo.svg" alt="Apprie Logo" class="logo">
         <h1 class="app-title">Apprie</h1>
         <p class="app-subtitle">Medical AI Search</p>
     </div>
@@ -511,7 +512,7 @@
     <div class="chat-modal" id="chat-modal">
         <div class="chat-header">
             <div class="header-content">
-                <img src="apprie-logo.png" alt="Apprie Logo" class="chat-logo">
+                <img src="assets/img/apprie-logo.svg" alt="Apprie Logo" class="chat-logo">
                 <h2>Apprie Medical AI</h2>
             </div>
             <div class="action-buttons">
@@ -829,7 +830,55 @@
             // Download PDF button handler
             if (downloadPdfButton) {
                 downloadPdfButton.addEventListener('click', function() {
-                    alert('PDF generation would happen here in a real implementation.');
+                    const { jsPDF } = window.jspdf;
+                    
+                    // Get all AI messages in the modal
+                    const aiMessages = modalMessages.querySelectorAll('.message.assistant:not(.loading)');
+                    if (aiMessages.length === 0) {
+                        alert('No content to download. Please generate a report first.');
+                        return;
+                    }
+                    
+                    // Get the most recent AI message
+                    const latestMessage = aiMessages[aiMessages.length - 1];
+                    const content = latestMessage.textContent;
+                    
+                    // Create PDF instance
+                    const doc = new jsPDF();
+                    
+                    // Load the Apprie logo
+                    const img = new Image();
+                    img.onload = function() {
+                        // Calculate aspect ratio to maintain proportions
+                        const imgWidth = 30;
+                        const imgHeight = (img.height * imgWidth) / img.width;
+                        
+                        // Add logo centered at the top
+                        doc.addImage(this, 'PNG', (doc.internal.pageSize.width - imgWidth) / 2, 10, imgWidth, imgHeight);
+                        
+                        // Add title (moved down to accommodate logo)
+                        doc.setFontSize(16);
+                        doc.setTextColor(0, 51, 102);
+                        doc.text('Medical Report', 105, 35, { align: 'center' });
+                        
+                        // Add date
+                        doc.setFontSize(10);
+                        doc.setTextColor(100);
+                        const date = new Date().toLocaleDateString();
+                        doc.text(`Generated on ${date}`, 105, 45, { align: 'center' });
+                        
+                        // Add content
+                        doc.setFontSize(12);
+                        doc.setTextColor(0);
+                        
+                        // Split text into lines to fit the page
+                        const splitText = doc.splitTextToSize(content, 180);
+                        doc.text(splitText, 15, 60);
+                        
+                        // Save the PDF
+                        doc.save('medical-report.pdf');
+                    };
+                    img.src = 'assets/img/apprie-logo.svg';
                 });
             }
         });

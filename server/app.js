@@ -33,12 +33,10 @@ async function testGroqConnection() {
 async function getAvailableModels() {
   const apiKey = process.env.GROQ_API_KEY;
   try {
-    console.log("Fetching available models from Groq API...");
+    console.log("Fetching models from Groq API...");
     const response = await fetch("https://api.groq.com/openai/v1/models", {
       headers: { "Authorization": `Bearer ${apiKey}` }
     });
-
-    console.log(`Response status: ${response.status}`);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -46,15 +44,14 @@ async function getAvailableModels() {
     }
 
     const models = await response.json();
-    console.log("Raw response:", models);
-
-    if (models.data) {
-      console.log("Available models:");
+    console.log("Available models:");
+    if (models.data && models.data.length > 0) {
       models.data.forEach(model => {
         console.log(`- ${model.id}`);
       });
     } else {
       console.log("No models found in response.");
+      console.log("Raw response:", JSON.stringify(models, null, 2));
     }
     return models;
   } catch (error) {
