@@ -461,6 +461,26 @@
         .pdf-button i {
             font-size: 1.2em;
         }
+        .support-button {
+            background: #4a4a4a;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        .support-button:hover {
+            background: #606060;
+        }
+        .support-button i {
+            font-size: 1em;
+        }
     </style>
 </head>
 <body>
@@ -468,6 +488,9 @@
         <img src="assets/img/fingerprint-icon.svg" alt="Apprie Logo" class="logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot; fill=&quot;%23fff&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;45&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 35C41.7 35 35 41.7 35 50C35 58.3 41.7 65 50 65&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 45C47.2 45 45 47.2 45 50C45 52.8 47.2 55 50 55&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><circle cx=&quot;60&quot; cy=&quot;50&quot; r=&quot;5&quot; /></svg>'">
         <h1 class="app-title">Apprie</h1>
         <p class="app-subtitle">Medical Copilot by Apprie AI</p>
+        <button class="support-button" id="main-support-button">
+            <i class="fas fa-heart"></i> Support Us
+        </button>
     </div>
 
     <div class="search-container">
@@ -563,6 +586,9 @@
             <button class="pdf-button" id="download-pdf" title="Download PDF">
                 <i class="fas fa-file-pdf"></i> Download PDF
             </button>
+            <button class="support-button" id="modal-support-button">
+                <i class="fas fa-heart"></i> Support Us
+            </button>
         </div>
         
         <div class="messages-container" id="modal-messages"></div>
@@ -592,6 +618,10 @@
             const modalMessages = document.getElementById('modal-messages');
             const taskButtons = document.querySelectorAll('.task-button');
             const downloadPdfButton = document.getElementById('download-pdf');
+            
+            // Support buttons
+            const mainSupportButton = document.getElementById('main-support-button');
+            const modalSupportButton = document.getElementById('modal-support-button');
             
             let currentTask = 'clinical';
             
@@ -980,6 +1010,47 @@
                         alert("Error generating PDF: " + err.message);
                     }
                 });
+            }
+            
+            // Support modal handlers
+            function showSupportModal() {
+                // Create a simple modal for support options
+                const supportModalHTML = `
+                    <div id="support-modal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center;">
+                        <div style="background: #1a1a1a; border-radius: 12px; padding: 20px; max-width: 500px; width: 90%; position: relative;">
+                            <button id="close-support-modal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+                            <h2 style="color: white; margin-bottom: 15px; text-align: center;">Support Apprie</h2>
+                            <p style="color: #ccc; margin-bottom: 20px; text-align: center;">Help us bring better healthcare to remote and underserved areas</p>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <a href="#" style="background: #2196F3; color: white; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center;">Make a One-Time Donation</a>
+                                <a href="#" style="background: #4CAF50; color: white; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center;">Become a Monthly Supporter</a>
+                                <a href="#" style="background: #FF9800; color: white; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center;">Sponsor a Remote Clinic</a>
+                                <a href="#" style="background: #9C27B0; color: white; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center;">Contribute to Open Source Development</a>
+                            </div>
+                            
+                            <p style="color: #aaa; margin-top: 20px; font-size: 12px; text-align: center;">Apprie is committed to providing medical AI assistance to those who need it most. Your support helps us maintain and improve our services.</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add modal to body
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = supportModalHTML;
+                document.body.appendChild(modalContainer);
+                
+                // Handle close button
+                document.getElementById('close-support-modal').addEventListener('click', function() {
+                    document.getElementById('support-modal').remove();
+                });
+            }
+            
+            // Add event listeners to support buttons
+            if(mainSupportButton) {
+                mainSupportButton.addEventListener('click', showSupportModal);
+            }
+            if(modalSupportButton) {
+                modalSupportButton.addEventListener('click', showSupportModal);
             }
         });
     </script>
