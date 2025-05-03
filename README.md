@@ -192,6 +192,7 @@ Required environment variables in `.env`:
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `ANTHROPIC_API_KEY`: Your Anthropic API key (optional)
 - `PORT`: Server port (default: 3000)
+- `JWT_SECRET`: Your JWT secret (optional) # openssl rand -base64 32
 
 ## Contributing
 

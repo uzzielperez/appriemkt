@@ -1,5 +1,5 @@
 require('dotenv').config();
-const app = require('./app');
+const { app } = require('./app');
 
 // Add startup logging
 console.log('\n=== SERVER STARTUP ===');
