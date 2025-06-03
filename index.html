@@ -16,21 +16,12 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
         <style>
-            .model-selector {
-                background-color: rgba(80, 80, 80, 0.3);
-                color: var(--text-color);
-                border: none;
-                padding: 5px 10px;
-                border-radius: 20px;
-                cursor: pointer;
-                outline: none;
-                font-size: 14px;
-            }
-
-            .model-selector option {
-                background-color: var(--bg-color);
-                color: var(--text-color);
-                padding: 5px;
+            #typewriter-prompt {
+                font-size: 1.5rem; /* Adjust size as needed */
+                font-weight: 500; /* Adjust weight as needed */
+                color: #ffc800; /* Example color, change as needed */
+                height: 2em; /* Reserve space to prevent layout shifts */
+                margin-top: 1rem; /* Add some space above */
             }
         </style>
     </head>
@@ -59,7 +50,8 @@
             <div class="container">
                 <div class="masthead-subheading">Welcome To Apprie!</div>
                 <div class="masthead-heading text-uppercase">Open Healthcare and AI</div>
-                <a class="btn btn-primary btn-xl text-uppercase" href="/chat.html">Test our Product</a>
+                <div id="typewriter-prompt"></div>
+                <a class="btn btn-primary btn-xl text-uppercase" href="chat.html">Test our Product</a>
             </div>
         </header>
         <!-- Services-->
@@ -660,7 +652,19 @@
         <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
         <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
-        <script src="/js/chat-service.js"></script>
-        <script src="/js/chat.js"></script>
+        <script src="js/typewriter.js"></script>
+        <script>
+            // Initialize the typewriter
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const prompts = [
+                    "What are the symptoms of a common cold?",
+                    "Find a local pharmacy open now.",
+                    "What are the side effects of this medication?",
+                    "Schedule a doctor's appointment.",
+                    "How can AI improve healthcare?"
+                ];
+                typewriter('typewriter-prompt', prompts);
+            });
+        </script>
     </body>
 </html>

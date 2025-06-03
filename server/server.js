@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const http = require('http');
+const WebSocket = require('ws');
+const { Groq } = require('groq-sdk');
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +16,10 @@ const { getAvailableModels } = require('./app');
 
 const app = express();
 const upload = multer();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // Apply CSP headers to all responses
 app.use((req, res, next) => {
@@ -301,7 +308,7 @@ const PORT = process.env.PORT || 3000;
   console.log("=== Fetching Available Models ===");
   await getAvailableModels();
 })();
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`\nServer running on port ${PORT}`);
     console.log(`http://localhost:${PORT}\n`);
     console.log('Environment check:', {
