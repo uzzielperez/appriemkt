@@ -16,12 +16,10 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
         <style>
-            #typewriter-prompt {
-                font-size: 1.5rem; /* Adjust size as needed */
-                font-weight: 500; /* Adjust weight as needed */
-                color: #ffc800; /* Example color, change as needed */
-                height: 2em; /* Reserve space to prevent layout shifts */
-                margin-top: 1rem; /* Add some space above */
+            /* Removed #typewriter-prompt styles */
+            .masthead-heading {
+                /* You might want to set a min-height here if the text change causes layout shifts */
+                /* min-height: 2em; Ensure this matches the expected height of the text */
             }
         </style>
     </head>
@@ -49,8 +47,7 @@
         <header class="masthead">
             <div class="container">
                 <div class="masthead-subheading">Welcome To Apprie!</div>
-                <div class="masthead-heading text-uppercase">Open Healthcare and AI</div>
-                <div id="typewriter-prompt"></div>
+                <div class="masthead-heading text-uppercase" id="animated-masthead-heading"></div>
                 <a class="btn btn-primary btn-xl text-uppercase" href="chat.html">Test our Product</a>
             </div>
         </header>
@@ -654,16 +651,10 @@
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
         <script src="js/typewriter.js"></script>
         <script>
-            // Initialize the typewriter
+            // Initialize the new typewriter effect
             document.addEventListener('DOMContentLoaded', (event) => {
-                const prompts = [
-                    "What are the symptoms of a common cold?",
-                    "Find a local pharmacy open now.",
-                    "What are the side effects of this medication?",
-                    "Schedule a doctor's appointment.",
-                    "How can AI improve healthcare?"
-                ];
-                typewriter('typewriter-prompt', prompts);
+                const textToDisplay = "OPEN HEALTHCARE Augmented Intelligence";
+                typeOnce('animated-masthead-heading', textToDisplay, 100); // Adjust speed as needed
             });
         </script>
     </body>
