@@ -626,7 +626,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
-            const sendButton = document.getElementById('sendButton');
+            const sendButton = document.getElementById('submit-button');
             const messagesContainer = document.getElementById('messagesContainer');
             const modelSelect = document.getElementById('model-select');
             const categories = document.querySelectorAll('.category');
@@ -1029,7 +1029,12 @@
                     }
                 });
             }
+
+            document.getElementById('attachment-button').addEventListener('click', () => {
+                document.getElementById('file-input').click();
+            });
         });
     </script>
+    <script src="js/chat.js"></script>
 </body>
 </html>
