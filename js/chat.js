@@ -57,7 +57,7 @@ async function uploadFile() {
         formData.append('message', 'Please analyze this document');
 
         // Upload file and get analysis
-        const uploadResponse = await fetch('/.netlify/functions/test-upload', {
+        const uploadResponse = await fetch('/.netlify/functions/document-handler', {
             method: 'POST',
             body: formData
         });
@@ -120,7 +120,7 @@ async function sendMessage() {
             formData.append('message', message || 'Please analyze this document');
 
             // Upload file and get analysis
-            const uploadResponse = await fetch('/.netlify/functions/test-upload', {
+            const uploadResponse = await fetch('/.netlify/functions/document-handler', {
                 method: 'POST',
                 body: formData
             });
