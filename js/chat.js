@@ -14,11 +14,14 @@ document.getElementById('file-input').addEventListener('change', (e) => {
         const container = document.getElementById('file-upload-container');
         const preview = document.getElementById('file-preview');
         
-        // Show file preview
+        // Show file preview with upload button
         container.classList.add('show');
         preview.innerHTML = `
             <i class="fas fa-file"></i>
             <span class="file-name">${file.name}</span>
+            <button class="upload-file-btn" onclick="uploadFile()" title="Upload and analyze file">
+                <i class="fas fa-upload"></i>
+            </button>
             <i class="fas fa-times remove-file" onclick="removeFile()"></i>
         `;
     }
@@ -33,15 +36,72 @@ function removeFile() {
     document.getElementById('file-input').value = '';
 }
 
+// Function to upload file directly
+async function uploadFile() {
+    if (!currentFile) return;
+    
+    try {
+        // Show uploading state
+        const uploadBtn = document.querySelector('.upload-file-btn');
+        if (uploadBtn) {
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            uploadBtn.disabled = true;
+        }
+        
+        // Add user message indicating file upload
+        addMessageToChat('user', `📎 Uploaded: ${currentFile.name}`);
+        
+        // Create FormData and append file
+        const formData = new FormData();
+        formData.append('document', currentFile);
+        formData.append('message', 'Please analyze this document');
+
+        // Upload file and get analysis
+        const uploadResponse = await fetch('/.netlify/functions/document-handler', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!uploadResponse.ok) {
+            throw new Error('File upload failed');
+        }
+
+        const result = await uploadResponse.json();
+        
+        if (result.analysis) {
+            addMessageToChat('assistant', result.analysis);
+        } else if (result.documentId) {
+            addMessageToChat('assistant', 'Document uploaded successfully! You can now ask questions about it.');
+        }
+
+        // Clear the file upload
+        removeFile();
+        
+    } catch (error) {
+        console.error('Error:', error);
+        addMessageToChat('assistant', 'Sorry, there was an error uploading your file. Please try again.');
+        
+        // Reset upload button
+        const uploadBtn = document.querySelector('.upload-file-btn');
+        if (uploadBtn) {
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i>';
+            uploadBtn.disabled = false;
+        }
+    }
+}
+
 // Modified sendMessage function to handle file uploads
 async function sendMessage() {
     const messageInput = document.getElementById('searchInput');
     const message = messageInput.value.trim();
     
+    // Allow sending if there's a message OR a file
     if (!message && !currentFile) return;
 
-    // Add user message to chat
-    addMessageToChat('user', message);
+    // Add user message to chat (if there's a message)
+    if (message) {
+        addMessageToChat('user', message);
+    }
     messageInput.value = '';
 
     try {
@@ -51,7 +111,7 @@ async function sendMessage() {
             // Create FormData and append file
             const formData = new FormData();
             formData.append('document', currentFile);
-            formData.append('message', message);
+            formData.append('message', message || 'Please analyze this document');
 
             // Upload file and get analysis
             const uploadResponse = await fetch('/.netlify/functions/document-handler', {
@@ -63,40 +123,28 @@ async function sendMessage() {
                 throw new Error('File upload failed');
             }
 
-            const { documentId } = await uploadResponse.json();
-
-            // Get analysis of the document
-            response = await fetch('/.netlify/functions/document-handler', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    documentId,
-                    analysisType: 'analysis',
-                    message
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Analysis failed');
+            const result = await uploadResponse.json();
+            
+            if (result.analysis) {
+                addMessageToChat('assistant', result.analysis);
+            } else if (result.documentId) {
+                addMessageToChat('assistant', 'Document uploaded successfully! You can now ask questions about it.');
             }
-
-            const analysisResult = await response.json();
-            addMessageToChat('assistant', analysisResult.analysis);
 
             // Clear the file upload
             removeFile();
         } else {
             // Regular chat message processing
-            response = await fetch('/.netlify/functions/chat-handler', {
+            response = await fetch('/.netlify/functions/groq', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message,
-                    model: document.getElementById('modelSelect').value
+                    query: message,
+                    model: 'groq',
+                    modelName: document.getElementById('model-select').value,
+                    task: 'clinical'
                 })
             });
 
@@ -111,6 +159,16 @@ async function sendMessage() {
         console.error('Error:', error);
         addMessageToChat('assistant', 'Sorry, there was an error processing your request. Please try again.');
     }
+}
+
+// Helper function to add messages to chat
+function addMessageToChat(sender, message) {
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    messageDiv.textContent = message;
+    messagesContainer.appendChild(messageDiv);
+    messageDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Add click and enter key handlers for the submit button

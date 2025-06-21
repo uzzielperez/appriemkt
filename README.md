@@ -30,10 +30,47 @@ appriemkt/
 ## Features
 - **Multi-API Chat**: Choose from ChatGPT, Claude, Grok, DeepSeek, or a Medical LLM.
 - **File Uploads**: Attach medical data (PDFs, images, text).
+- **Document Parsing**: Upload and analyze PDF, TXT, DOC, and DOCX files with AI-powered analysis.
 - **Voice Input**: Record and process audio queries.
 - **Deep Search**: Pull medical insights from web/X sources.
 - **Stripe Payments**: Token-based subscriptions.
 - **Grok-like Design**: Dark, neon, futuristic UI.
+
+## Document Upload & Analysis
+
+Apprie supports intelligent document processing with the following capabilities:
+
+### Supported File Types
+- **PDF Documents** (.pdf): Full text extraction using pdf-parse library
+- **Text Files** (.txt): Direct UTF-8 text processing
+- **Word Documents** (.doc/.docx): Basic text extraction (limited support)
+
+### How to Upload Documents
+1. Click the paperclip (📎) icon in the chat interface
+2. Select your document from the file picker
+3. Click the upload button (📤) in the file preview
+4. The system will automatically:
+   - Extract text content from your document
+   - Send it to Groq AI for comprehensive analysis
+   - Display the AI analysis in the chat
+
+### Document Analysis Features
+The AI provides comprehensive analysis including:
+- Main topics and key points extraction
+- Important findings and conclusions
+- Medical/clinical relevance assessment (when applicable)
+- Summary of key information
+- Contextual insights based on document content
+
+### Technical Implementation
+- **Backend**: Netlify serverless function (`/netlify/functions/document-handler.js`)
+- **AI Processing**: Groq's mixtral-8x7b-32768 model
+- **Text Extraction**: 
+  - PDF: `pdf-parse` library for accurate text extraction
+  - Text: Direct UTF-8 encoding
+  - Word: Basic text extraction with character filtering
+- **Content Limits**: Documents are processed up to ~8000 characters for optimal performance
+- **Error Handling**: Comprehensive error reporting for unsupported formats or parsing failures
 
 ## Prerequisites
 - Node.js (v23.3.0+)
@@ -41,10 +78,10 @@ appriemkt/
 - Git
 - Netlify CLI (`npm install -g netlify-cli`)
 - Heroku CLI (or AWS CLI)
-- API Keys: OpenAI, Anthropic, xAI, DeepSeek, Medical LLM, Stripe
+- API Keys: OpenAI, Anthropic, Groq, xAI, DeepSeek, Medical LLM, Stripe
 
 ```bash
-npm install express axios stripe multer dotenv
+npm install express axios stripe multer dotenv groq-sdk pdf-parse lambda-multipart-parser pg
 ``` 
 
 ## Setup
@@ -65,7 +102,7 @@ npm install express axios stripe multer dotenv
    npm init -y
    ```  
    ```bash
-   npm install express axios stripe multer dotenv groq
+   npm install express axios stripe multer dotenv groq-sdk pdf-parse lambda-multipart-parser pg
    ```
    - Ensure `package.json` and `package-lock.json` are present.
 ## Runing Locally
@@ -101,6 +138,10 @@ Server-side packages:
 - multer: Handle multipart/form-data
 - openai: OpenAI API client
 - @anthropic-ai/sdk: Anthropic API client
+- groq-sdk: Groq AI API client for document analysis
+- pdf-parse: PDF text extraction library
+- lambda-multipart-parser: Netlify function multipart form handling
+- pg: PostgreSQL client (for database integration)
 - jspdf: PDF generation
 
 Frontend libraries (CDN):
@@ -191,6 +232,7 @@ Licensed under the [GNU Affero General Public License v3.0](./LICENSE). This pro
 Required environment variables in `.env`:
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `ANTHROPIC_API_KEY`: Your Anthropic API key (optional)
+- `GROQ_API_KEY`: Your Groq API key (required for document analysis)
 - `PORT`: Server port (default: 3000)
 
 ## Contributing

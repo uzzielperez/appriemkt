@@ -210,6 +210,26 @@
         .remove-file:hover {
             color: #ff0000;
         }
+        .upload-file-btn {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .upload-file-btn:hover {
+            background-color: #006666;
+        }
+        .upload-file-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         #file-input {
             display: none;
         }

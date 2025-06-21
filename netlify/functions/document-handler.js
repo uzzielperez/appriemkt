@@ -92,180 +92,156 @@ async function storeAnalysis(documentId, analysisType, result) {
 }
 
 exports.handler = async (event, context) => {
-  // Handle CORS
+  // Set CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
+  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
-      }
+      headers,
+      body: '',
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' }),
     };
   }
 
   try {
-    if (event.httpMethod === 'POST') {
-      if (event.path.endsWith('/upload')) {
-        // Handle file upload
-        const { files } = await multipart.parse(event);
-        if (!files || files.length === 0) {
-          return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'No file uploaded' })
-          };
-        }
-
-        const file = files[0];
-        let content;
-
-        // Extract text based on content type
-        if (file.contentType === 'application/pdf') {
-          content = await extractTextFromPDF(file.content);
-        } else if (file.contentType === 'text/plain') {
-          content = file.content.toString('utf-8');
-        } else {
-          return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Unsupported file type' })
-          };
-        }
-
-        // Store document in database
-        const documentId = await storeDocument(
-          file.filename,
-          file.originalname,
-          file.contentType,
-          content
-        );
-
-        return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify({
-            message: 'File uploaded successfully',
-            documentId
-          })
-        };
-
-      } else if (event.path.endsWith('/analyze')) {
-        // Handle document analysis
-        const { documentId, analysisType } = JSON.parse(event.body);
-
-        // Get document content from database
-        const client = await pool.connect();
-        try {
-          const result = await client.query(
-            'SELECT content FROM documents WHERE id = $1',
-            [documentId]
-          );
-
-          if (result.rows.length === 0) {
-            return {
-              statusCode: 404,
-              body: JSON.stringify({ error: 'Document not found' })
-            };
-          }
-
-          const { content } = result.rows[0];
-
-          // Prepare prompt based on analysis type
-          let prompt;
-          switch (analysisType) {
-            case 'summary':
-              prompt = `Please provide a concise summary of the following text:\n\n${content}`;
-              break;
-            case 'keyPoints':
-              prompt = `Please extract the key points from the following text:\n\n${content}`;
-              break;
-            case 'analysis':
-              prompt = `Please provide a detailed analysis of the following text, including main themes, arguments, and any notable findings:\n\n${content}`;
-              break;
-            default:
-              prompt = `Please analyze the following text and provide key insights:\n\n${content}`;
-          }
-
-          // Get AI analysis
-          const response = await groq.chat.completions.create({
-            messages: [{
-              role: 'user',
-              content: prompt
-            }],
-            model: 'mixtral-8x7b-32768',
-            temperature: 0.7,
-            max_tokens: 4000,
-          });
-
-          // Store analysis result
-          await storeAnalysis(documentId, analysisType, response.choices[0].message.content);
-
-          return {
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
-              analysis: response.choices[0].message.content,
-              documentInfo: {
-                documentId,
-                analysisType
-              }
-            })
-          };
-        } finally {
-          client.release();
-        }
-      }
-    } else if (event.httpMethod === 'GET') {
-      // Handle retrieving document or analysis
-      const matches = event.path.match(/\/documents\/(\d+)/);
-      if (matches) {
-        const documentId = matches[1];
-        const client = await pool.connect();
-        try {
-          const result = await client.query(
-            `SELECT d.*, a.analysis_type, a.result as analysis_result 
-             FROM documents d 
-             LEFT JOIN analyses a ON d.id = a.document_id 
-             WHERE d.id = $1`,
-            [documentId]
-          );
-
-          if (result.rows.length === 0) {
-            return {
-              statusCode: 404,
-              body: JSON.stringify({ error: 'Document not found' })
-            };
-          }
-
-          return {
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify(result.rows[0])
-          };
-        } finally {
-          client.release();
-        }
-      }
+    console.log('Document handler called');
+    
+    // Parse multipart form data
+    const result = await multipart.parse(event);
+    console.log('Parsed result:', Object.keys(result));
+    
+    if (!result.document) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'No document provided' }),
+      };
     }
 
+    const file = result.document;
+    const message = result.message || 'Please analyze this document';
+    
+    console.log('File info:', {
+      filename: file.filename,
+      contentType: file.contentType,
+      size: file.content.length
+    });
+
+    let documentText = '';
+
+    // Parse document based on content type
+    try {
+      if (file.contentType === 'application/pdf') {
+        console.log('Parsing PDF...');
+        const pdfData = await pdfParse(file.content);
+        documentText = pdfData.text;
+      } else if (file.contentType === 'text/plain') {
+        console.log('Parsing text file...');
+        documentText = file.content.toString('utf-8');
+      } else if (file.contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        console.log('DOCX files not yet supported - extracting basic text');
+        documentText = file.content.toString('utf-8').replace(/[^\x20-\x7E]/g, ' ');
+      } else if (file.contentType === 'application/msword') {
+        console.log('DOC files not yet supported - extracting basic text');
+        documentText = file.content.toString('utf-8').replace(/[^\x20-\x7E]/g, ' ');
+      } else {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Unsupported file type' }),
+        };
+      }
+    } catch (parseError) {
+      console.error('Document parsing error:', parseError);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Failed to parse document' }),
+      };
+    }
+
+    console.log('Extracted text length:', documentText.length);
+
+    if (!documentText.trim()) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'No text content found in document' }),
+      };
+    }
+
+    // Limit text length for API call (approximately 8000 characters)
+    const maxLength = 8000;
+    if (documentText.length > maxLength) {
+      documentText = documentText.substring(0, maxLength) + '...[truncated]';
+    }
+
+    // Create analysis prompt
+    const prompt = `${message}
+
+Document content:
+${documentText}
+
+Please provide a comprehensive analysis of this document, including:
+1. Main topics and key points
+2. Important findings or conclusions
+3. Any medical/clinical relevance (if applicable)
+4. Summary of key information
+
+Analysis:`;
+
+    console.log('Calling Groq API...');
+
+    // Get AI analysis using Groq
+    const response = await groq.chat.completions.create({
+      messages: [{
+        role: 'user',
+        content: prompt
+      }],
+      model: 'mixtral-8x7b-32768',
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+
+    const analysis = response.choices[0].message.content;
+
+    console.log('Analysis completed, length:', analysis.length);
+
     return {
-      statusCode: 404,
-      body: JSON.stringify({ error: 'Not found' })
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        analysis: analysis,
+        documentInfo: {
+          filename: file.filename,
+          contentType: file.contentType,
+          textLength: documentText.length
+        }
+      }),
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Handler error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      headers,
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
     };
   }
 }; 
