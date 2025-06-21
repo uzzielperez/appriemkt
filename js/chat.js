@@ -57,16 +57,22 @@ async function uploadFile() {
         formData.append('message', 'Please analyze this document');
 
         // Upload file and get analysis
-        const uploadResponse = await fetch('/.netlify/functions/document-handler', {
+        const uploadResponse = await fetch('/.netlify/functions/test-upload', {
             method: 'POST',
             body: formData
         });
 
+        console.log('Upload response status:', uploadResponse.status);
+        console.log('Upload response headers:', uploadResponse.headers);
+
         if (!uploadResponse.ok) {
-            throw new Error('File upload failed');
+            const errorText = await uploadResponse.text();
+            console.error('Server error response:', errorText);
+            throw new Error(`File upload failed: ${uploadResponse.status} - ${errorText}`);
         }
 
         const result = await uploadResponse.json();
+        console.log('Upload result:', result);
         
         if (result.analysis) {
             addMessageToChat('assistant', result.analysis);
@@ -114,16 +120,22 @@ async function sendMessage() {
             formData.append('message', message || 'Please analyze this document');
 
             // Upload file and get analysis
-            const uploadResponse = await fetch('/.netlify/functions/document-handler', {
+            const uploadResponse = await fetch('/.netlify/functions/test-upload', {
                 method: 'POST',
                 body: formData
             });
 
+            console.log('Upload response status:', uploadResponse.status);
+            console.log('Upload response headers:', uploadResponse.headers);
+
             if (!uploadResponse.ok) {
-                throw new Error('File upload failed');
+                const errorText = await uploadResponse.text();
+                console.error('Server error response:', errorText);
+                throw new Error(`File upload failed: ${uploadResponse.status} - ${errorText}`);
             }
 
             const result = await uploadResponse.json();
+            console.log('Upload result:', result);
             
             if (result.analysis) {
                 addMessageToChat('assistant', result.analysis);
