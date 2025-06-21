@@ -5,6 +5,84 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+// Simple PDF text extraction function
+function extractTextFromPDF(buffer) {
+  try {
+    // Convert buffer to string and look for text content
+    const pdfString = buffer.toString('latin1');
+    
+    // Simple regex patterns to extract text from PDF
+    const textPatterns = [
+      /BT\s*\/\w+\s+\d+\s+Tf\s*(.+?)\s*ET/g,
+      /\(([^)]+)\)\s*Tj/g,
+      /\[([^\]]+)\]\s*TJ/g,
+      /\/Length\s+\d+[^>]*>\s*stream\s*(.+?)\s*endstream/gs
+    ];
+    
+    let extractedText = '';
+    
+    // Try different extraction methods
+    for (const pattern of textPatterns) {
+      const matches = pdfString.match(pattern);
+      if (matches) {
+        matches.forEach(match => {
+          // Clean up the extracted text
+          let text = match.replace(/BT|ET|Tj|TJ|\[|\]|\(|\)/g, '');
+          text = text.replace(/\/\w+\s+\d+\s+Tf/g, '');
+          text = text.replace(/[^\x20-\x7E\s]/g, ' ');
+          text = text.replace(/\s+/g, ' ').trim();
+          if (text.length > 3) {
+            extractedText += text + ' ';
+          }
+        });
+      }
+    }
+    
+    // Alternative: Look for readable text between parentheses
+    const textInParens = pdfString.match(/\(([^)]{3,})\)/g);
+    if (textInParens) {
+      textInParens.forEach(match => {
+        const text = match.replace(/[()]/g, '').trim();
+        if (text.length > 3 && /[a-zA-Z]/.test(text)) {
+          extractedText += text + ' ';
+        }
+      });
+    }
+    
+    // Clean up final text
+    extractedText = extractedText.replace(/\s+/g, ' ').trim();
+    
+    if (extractedText.length < 50) {
+      // If we couldn't extract much text, return a helpful message
+      return `I was able to detect this is a PDF file, but I had difficulty extracting the text content. This might be because:
+
+1. The PDF contains scanned images rather than selectable text
+2. The PDF has complex formatting or is password protected
+3. The text extraction method needs improvement
+
+To get better results, you could:
+- Copy and paste the text directly from the PDF into the chat
+- Convert the PDF to a text file
+- Use a PDF with selectable text rather than scanned images
+
+I can still help answer questions about the document if you describe its contents or paste relevant sections.`;
+    }
+    
+    return extractedText;
+    
+  } catch (error) {
+    console.error('PDF extraction error:', error);
+    return `I encountered an error while trying to extract text from this PDF. This might be due to the PDF format or encoding. 
+
+Please try:
+1. Copying the text directly from the PDF and pasting it into the chat
+2. Converting the PDF to a text file
+3. Describing the document contents so I can help answer your questions
+
+Error details: ${error.message}`;
+  }
+}
+
 // Simple multipart parser for basic file uploads
 function parseMultipart(body, boundary) {
   const parts = body.split(`--${boundary}`);
@@ -129,29 +207,8 @@ exports.handler = async (event, context) => {
     // Parse document based on content type
     try {
       if (file.contentType === 'application/pdf') {
-        console.log('PDF parsing temporarily disabled - will add support soon');
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({
-            analysis: `I see you've uploaded a PDF file named "${file.filename}". 
-
-PDF parsing is temporarily disabled due to technical limitations in our serverless environment. 
-
-Here are your options:
-1. **Convert to text**: Copy the text content from your PDF and paste it directly into the chat
-2. **Use a text file**: Save your content as a .txt file and upload that instead
-3. **Wait for PDF support**: We're working on implementing proper PDF parsing and it will be available soon
-
-For now, you can ask me questions about medical topics directly in the chat, or upload text files for analysis.`,
-            documentInfo: {
-              filename: file.filename,
-              contentType: file.contentType,
-              textLength: 0,
-              note: "PDF parsing temporarily unavailable"
-            }
-          }),
-        };
+        console.log('Parsing PDF with custom extractor...');
+        documentText = extractTextFromPDF(file.content);
       } else if (file.contentType === 'text/plain') {
         console.log('Parsing text file...');
         documentText = file.content.toString('utf-8');
@@ -167,7 +224,7 @@ For now, you can ask me questions about medical topics directly in the chat, or 
           statusCode: 400,
           headers,
           body: JSON.stringify({ 
-            error: `Unsupported file type: ${file.contentType}. Currently supported: .txt files. PDF support coming soon.` 
+            error: `Unsupported file type: ${file.contentType}. Currently supported: .txt and .pdf files.` 
           }),
         };
       }
@@ -199,7 +256,8 @@ For now, you can ask me questions about medical topics directly in the chat, or 
     // Create analysis prompt
     const prompt = `${message}
 
-Document content:
+Document: ${file.filename}
+Content:
 ${documentText}
 
 Please provide a comprehensive analysis of this document, including:

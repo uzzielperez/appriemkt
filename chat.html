@@ -131,9 +131,17 @@
             resize: none;
             min-height: 80px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
         .search-input::placeholder {
             color: #777;
+        }
+        .search-input.drag-over {
+            border: 2px dashed var(--primary-color);
+            background-color: rgba(0, 128, 128, 0.1);
+        }
+        .search-input.drag-over::placeholder {
+            color: var(--primary-color);
         }
         /* Button styles */
         .search-actions {

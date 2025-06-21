@@ -3,6 +3,88 @@
 // File upload handling
 let currentFile = null;
 
+// Drag and drop functionality
+function setupDragAndDrop() {
+    const searchInput = document.getElementById('searchInput');
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        searchInput.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        searchInput.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        searchInput.addEventListener(eventName, unhighlight, false);
+    });
+    
+    // Handle dropped files
+    searchInput.addEventListener('drop', handleDrop, false);
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    function highlight(e) {
+        searchInput.classList.add('drag-over');
+        searchInput.placeholder = 'Drop your file here...';
+    }
+    
+    function unhighlight(e) {
+        searchInput.classList.remove('drag-over');
+        searchInput.placeholder = 'Ask a question...';
+    }
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            handleFileSelection(file);
+        }
+    }
+}
+
+// Unified file handling function
+function handleFileSelection(file) {
+    // Check file type
+    const allowedTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    
+    if (!allowedTypes.includes(file.type)) {
+        addMessageToChat('assistant', `Sorry, "${file.name}" is not a supported file type. Please upload PDF, TXT, DOC, or DOCX files.`);
+        return;
+    }
+    
+    currentFile = file;
+    const container = document.getElementById('file-upload-container');
+    const preview = document.getElementById('file-preview');
+    
+    // Show file preview with upload button
+    container.classList.add('show');
+    preview.innerHTML = `
+        <i class="fas fa-file"></i>
+        <span class="file-name">${file.name}</span>
+        <button class="upload-file-btn" onclick="uploadFile()" title="Upload and analyze file">
+            <i class="fas fa-upload"></i>
+        </button>
+        <i class="fas fa-times remove-file" onclick="removeFile()"></i>
+    `;
+    
+    // Add a message to the chat
+    addMessageToChat('user', `📎 File selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+}
+
+// Initialize drag and drop when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupDragAndDrop();
+});
+
 document.getElementById('attachment-button').addEventListener('click', () => {
     document.getElementById('file-input').click();
 });
@@ -10,20 +92,7 @@ document.getElementById('attachment-button').addEventListener('click', () => {
 document.getElementById('file-input').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
-        currentFile = file;
-        const container = document.getElementById('file-upload-container');
-        const preview = document.getElementById('file-preview');
-        
-        // Show file preview with upload button
-        container.classList.add('show');
-        preview.innerHTML = `
-            <i class="fas fa-file"></i>
-            <span class="file-name">${file.name}</span>
-            <button class="upload-file-btn" onclick="uploadFile()" title="Upload and analyze file">
-                <i class="fas fa-upload"></i>
-            </button>
-            <i class="fas fa-times remove-file" onclick="removeFile()"></i>
-        `;
+        handleFileSelection(file);
     }
 });
 
