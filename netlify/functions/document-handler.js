@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const { Anthropic } = require('@anthropic-ai/sdk');
+const { Groq } = require('groq-sdk');
 const pdfParse = require('pdf-parse');
 const multipart = require('lambda-multipart-parser');
 
@@ -11,9 +11,9 @@ const pool = new Pool({
   }
 });
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 // Helper function to create database tables if they don't exist
@@ -189,17 +189,18 @@ exports.handler = async (event, context) => {
           }
 
           // Get AI analysis
-          const response = await anthropic.messages.create({
-            model: 'claude-3-opus-20240229',
-            max_tokens: 4000,
+          const response = await groq.chat.completions.create({
             messages: [{
               role: 'user',
               content: prompt
-            }]
+            }],
+            model: 'mixtral-8x7b-32768',
+            temperature: 0.7,
+            max_tokens: 4000,
           });
 
           // Store analysis result
-          await storeAnalysis(documentId, analysisType, response.content[0].text);
+          await storeAnalysis(documentId, analysisType, response.choices[0].message.content);
 
           return {
             statusCode: 200,
@@ -208,7 +209,7 @@ exports.handler = async (event, context) => {
               'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({
-              analysis: response.content[0].text,
+              analysis: response.choices[0].message.content,
               documentInfo: {
                 documentId,
                 analysisType

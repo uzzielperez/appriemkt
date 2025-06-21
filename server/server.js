@@ -31,11 +31,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
 // Serve static files from the assets directory (where favicon.ico is located)
 app.use(express.static(path.join(__dirname, '../assets')));
 
 // Serve static files from the root directory
 app.use(express.static(path.join(__dirname, '../')));
+
+// Serve files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Update CORS configuration
 app.use(cors({
@@ -51,16 +60,23 @@ if (!process.env.GROQ_API_KEY) {
     console.error('GROQ_API_KEY is not set in .env file');
 }
 
+if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not set in .env file');
+}
+
 // Log available models
 console.log('Available AI models:', {
-    groq: !!process.env.GROQ_API_KEY
+    groq: !!process.env.GROQ_API_KEY,
+    anthropic: !!process.env.ANTHROPIC_API_KEY
 });
 
 // Import routes
 const aiRoutes = require('./routes/aiRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 // Register routes
 app.use('/api/ai', aiRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Direct favicon serving route with explicit headers
 app.get('/favicon.ico', (req, res) => {

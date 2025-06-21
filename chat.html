@@ -154,10 +154,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
         .action-button:hover, .attachment-button:hover {
             background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
         }
         .submit-button {
             background-color: var(--primary-color);
@@ -165,6 +166,52 @@
         }
         .submit-button:hover {
             background-color: teal;
+        }
+        /* File upload styles */
+        .file-upload-container {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background-color: var(--input-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .file-upload-container.show {
+            display: block;
+        }
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .file-preview i {
+            color: var(--primary-color);
+        }
+        .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        .remove-file {
+            color: #ff4444;
+            cursor: pointer;
+            padding: 2px;
+        }
+        .remove-file:hover {
+            color: #ff0000;
+        }
+        #file-input {
+            display: none;
         }
         /* Category selector */
         .category-selector {
@@ -484,14 +531,15 @@
         
             <textarea id="searchInput" class="search-input" placeholder="Ask a question..." rows="1"></textarea>
             <div class="search-actions">
-                <button class="action-button attachment-button" title="Attach a file">
+                <input type="file" id="file-input" accept=".pdf,.txt,.doc,.docx" style="display: none;">
+                <button class="attachment-button" id="attachment-button" title="Attach file">
                     <i class="fas fa-paperclip"></i>
                 </button>
-                <button class="action-button microphone-button">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <button id="sendButton" class="action-button submit-button">
-                    <i class="fas fa-arrow-right"></i>
+                <div class="file-upload-container" id="file-upload-container">
+                    <div id="file-preview"></div>
+                </div>
+                <button class="action-button submit-button" id="submit-button">
+                    <i class="fas fa-arrow-up"></i>
                 </button>
             </div>
         </div>
