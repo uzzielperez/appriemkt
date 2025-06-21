@@ -1,5 +1,4 @@
 const { Groq } = require('groq-sdk');
-const pdfParse = require('pdf-parse');
 
 // Initialize Groq client
 const groq = new Groq({
@@ -130,9 +129,14 @@ exports.handler = async (event, context) => {
     // Parse document based on content type
     try {
       if (file.contentType === 'application/pdf') {
-        console.log('Parsing PDF...');
-        const pdfData = await pdfParse(file.content);
-        documentText = pdfData.text;
+        console.log('PDF parsing temporarily disabled - will add support soon');
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            error: 'PDF parsing is temporarily disabled. Please use text files (.txt) for now. PDF support will be added soon.' 
+          }),
+        };
       } else if (file.contentType === 'text/plain') {
         console.log('Parsing text file...');
         documentText = file.content.toString('utf-8');
@@ -147,7 +151,9 @@ exports.handler = async (event, context) => {
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: `Unsupported file type: ${file.contentType}` }),
+          body: JSON.stringify({ 
+            error: `Unsupported file type: ${file.contentType}. Currently supported: .txt files. PDF support coming soon.` 
+          }),
         };
       }
     } catch (parseError) {
@@ -190,6 +196,15 @@ Please provide a comprehensive analysis of this document, including:
 Analysis:`;
 
     console.log('Calling Groq API...');
+
+    // Check if Groq API key is available
+    if (!process.env.GROQ_API_KEY) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Groq API key not configured' }),
+      };
+    }
 
     // Get AI analysis using Groq
     const response = await groq.chat.completions.create({
