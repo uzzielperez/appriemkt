@@ -16,10 +16,20 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
         <style>
-            /* Removed #typewriter-prompt styles */
             .masthead-heading {
-                /* You might want to set a min-height here if the text change causes layout shifts */
-                /* min-height: 2em; Ensure this matches the expected height of the text */
+                min-height: 3.5em; /* Ensure consistent height during animation */
+                position: relative;
+                display: inline-block;
+            }
+            .masthead-heading::after {
+                content: '|';
+                position: absolute;
+                right: -8px;
+                animation: blink 0.8s infinite;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0; }
             }
         </style>
     </head>
@@ -629,12 +639,5 @@
         <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
         <script src="js/typewriter.js"></script>
-        <script>
-            // Initialize the new typewriter effect
-            document.addEventListener('DOMContentLoaded', (event) => {
-                const textToDisplay = "Patient-centered Augmented Healthcare Intelligence";
-                typeOnce('animated-masthead-heading', textToDisplay, 100); // Adjust speed as needed
-            });
-        </script>
     </body>
 </html>
