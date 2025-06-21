@@ -31,6 +31,15 @@
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0; }
             }
+            
+            /* Fixed Preview Button Styles */
+            .preview-button-container {
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+            }
         </style>
     </head>
     <body id="page-top">
@@ -58,9 +67,13 @@
             <div class="container">
                 <div class="masthead-subheading">Welcome To Apprie!</div>
                 <div class="masthead-heading text-uppercase" id="animated-masthead-heading"></div>
-                <a class="btn btn-primary btn-xl text-uppercase" href="chat.html">Preview</a>
             </div>
         </header>
+        
+        <!-- Fixed Preview Button -->
+        <div class="preview-button-container">
+            <a class="btn btn-primary btn-xl text-uppercase" href="chat.html">Preview</a>
+        </div>
         <!-- Services-->
         <section class="page-section" id="What We Do">
                 <div class="container">
