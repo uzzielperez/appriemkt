@@ -131,10 +131,25 @@ exports.handler = async (event, context) => {
       if (file.contentType === 'application/pdf') {
         console.log('PDF parsing temporarily disabled - will add support soon');
         return {
-          statusCode: 400,
+          statusCode: 200,
           headers,
-          body: JSON.stringify({ 
-            error: 'PDF parsing is temporarily disabled. Please use text files (.txt) for now. PDF support will be added soon.' 
+          body: JSON.stringify({
+            analysis: `I see you've uploaded a PDF file named "${file.filename}". 
+
+PDF parsing is temporarily disabled due to technical limitations in our serverless environment. 
+
+Here are your options:
+1. **Convert to text**: Copy the text content from your PDF and paste it directly into the chat
+2. **Use a text file**: Save your content as a .txt file and upload that instead
+3. **Wait for PDF support**: We're working on implementing proper PDF parsing and it will be available soon
+
+For now, you can ask me questions about medical topics directly in the chat, or upload text files for analysis.`,
+            documentInfo: {
+              filename: file.filename,
+              contentType: file.contentType,
+              textLength: 0,
+              note: "PDF parsing temporarily unavailable"
+            }
           }),
         };
       } else if (file.contentType === 'text/plain') {
