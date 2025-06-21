@@ -1,95 +1,11 @@
-const { Pool } = require('pg');
 const { Groq } = require('groq-sdk');
 const pdfParse = require('pdf-parse');
 const multipart = require('lambda-multipart-parser');
-
-// Initialize Neon client
-const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL || process.env.NETLIFY_DATABASE_URL_UNPOOLED,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
 
 // Initialize Groq client
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
-
-// Helper function to create database tables if they don't exist
-async function initializeDatabase() {
-  const client = await pool.connect();
-  try {
-    // Create tables in a transaction
-    await client.query('BEGIN');
-    
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS documents (
-        id SERIAL PRIMARY KEY,
-        filename TEXT NOT NULL,
-        original_name TEXT NOT NULL,
-        content_type TEXT NOT NULL,
-        content TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS analyses (
-        id SERIAL PRIMARY KEY,
-        document_id INTEGER REFERENCES documents(id),
-        analysis_type TEXT NOT NULL,
-        result TEXT NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await client.query('COMMIT');
-    console.log('Database initialized successfully');
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Error initializing database:', error);
-    throw error;
-  } finally {
-    client.release();
-  }
-}
-
-// Initialize database tables
-initializeDatabase().catch(console.error);
-
-// Helper function to extract text from PDF buffer
-async function extractTextFromPDF(buffer) {
-  const data = await pdfParse(buffer);
-  return data.text;
-}
-
-// Helper function to store document in database
-async function storeDocument(filename, originalName, contentType, content) {
-  const client = await pool.connect();
-  try {
-    const result = await client.query(
-      'INSERT INTO documents (filename, original_name, content_type, content) VALUES ($1, $2, $3, $4) RETURNING id',
-      [filename, originalName, contentType, content]
-    );
-    return result.rows[0].id;
-  } finally {
-    client.release();
-  }
-}
-
-// Helper function to store analysis in database
-async function storeAnalysis(documentId, analysisType, result) {
-  const client = await pool.connect();
-  try {
-    await client.query(
-      'INSERT INTO analyses (document_id, analysis_type, result) VALUES ($1, $2, $3)',
-      [documentId, analysisType, result]
-    );
-  } finally {
-    client.release();
-  }
-}
 
 exports.handler = async (event, context) => {
   // Set CORS headers
@@ -118,12 +34,15 @@ exports.handler = async (event, context) => {
 
   try {
     console.log('Document handler called');
+    console.log('Event body type:', typeof event.body);
+    console.log('Content-Type:', event.headers['content-type'] || event.headers['Content-Type']);
     
     // Parse multipart form data
     const result = await multipart.parse(event);
-    console.log('Parsed result:', Object.keys(result));
+    console.log('Parsed result keys:', Object.keys(result));
     
     if (!result.document) {
+      console.log('Available fields:', Object.keys(result));
       return {
         statusCode: 400,
         headers,
@@ -137,7 +56,7 @@ exports.handler = async (event, context) => {
     console.log('File info:', {
       filename: file.filename,
       contentType: file.contentType,
-      size: file.content.length
+      size: file.content ? file.content.length : 'undefined'
     });
 
     let documentText = '';
@@ -158,10 +77,11 @@ exports.handler = async (event, context) => {
         console.log('DOC files not yet supported - extracting basic text');
         documentText = file.content.toString('utf-8').replace(/[^\x20-\x7E]/g, ' ');
       } else {
+        console.log('Unsupported file type:', file.contentType);
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: 'Unsupported file type' }),
+          body: JSON.stringify({ error: `Unsupported file type: ${file.contentType}` }),
         };
       }
     } catch (parseError) {
@@ -169,7 +89,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Failed to parse document' }),
+        body: JSON.stringify({ error: 'Failed to parse document', details: parseError.message }),
       };
     }
 
