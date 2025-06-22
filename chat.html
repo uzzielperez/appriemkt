@@ -657,12 +657,36 @@
         }
 
         .sections-container {
-            flex: 0 1 30%;
+            flex: 0 0 auto;
             min-height: 200px;
-            max-height: 300px;
+            height: 300px;
             overflow-y: auto;
             padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
+        }
+
+        .resize-handle {
+            height: 6px;
+            background-color: var(--border-color);
+            cursor: row-resize;
+            position: relative;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .resize-handle:hover {
+            background-color: var(--primary-color);
+        }
+
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background-color: #666;
+            border-radius: 1px;
         }
 
         .document-sections {
@@ -899,6 +923,9 @@
                 <!-- Sections will be populated here -->
             </div>
         </div>
+
+        <!-- Resize Handle -->
+        <div class="resize-handle" id="resizeHandle"></div>
 
         <!-- PDF Viewer -->
         <div id="pdf-viewer-container" class="pdf-viewer-container" style="display: none;">
@@ -1452,6 +1479,42 @@
             document.getElementById('attachment-button').addEventListener('click', () => {
                 document.getElementById('file-input').click();
             });
+
+            // Resize handle functionality
+            const resizeHandle = document.getElementById('resizeHandle');
+            const sectionsContainer = document.querySelector('.sections-container');
+            const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+            
+            if (resizeHandle && sectionsContainer && pdfViewerContainer) {
+                let isResizing = false;
+                let startY = 0;
+                let startHeight = 0;
+
+                resizeHandle.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    startY = e.clientY;
+                    startHeight = sectionsContainer.offsetHeight;
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'row-resize';
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isResizing) return;
+                    
+                    const deltaY = e.clientY - startY;
+                    const newHeight = Math.max(150, Math.min(600, startHeight + deltaY));
+                    sectionsContainer.style.height = `${newHeight}px`;
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isResizing) {
+                        isResizing = false;
+                        document.body.style.userSelect = '';
+                        document.body.style.cursor = '';
+                    }
+                });
+            }
         });
     </script>
     <script src="js/chat.js"></script>
