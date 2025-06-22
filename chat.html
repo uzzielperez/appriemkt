@@ -636,10 +636,20 @@
             background-color: var(--primary-color);
             color: black;
             font-weight: 600;
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
         }
 
         .analyze-btn:hover {
             background-color: #00a0a0;
+        }
+
+        .analyze-btn:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
         }
 
         .sections-container {

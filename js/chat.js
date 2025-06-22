@@ -255,31 +255,78 @@ document.getElementById('searchInput').addEventListener('keypress', (e) => {
 
 // Sidebar functionality
 const documentSidebar = document.getElementById('document-sidebar');
-const closeSidebarBtn = document.getElementById('close-sidebar');
 const documentTitle = document.getElementById('document-title');
 const documentStats = document.getElementById('document-stats');
 const documentSectionsContainer = document.getElementById('document-sections');
-const selectAllBtn = document.getElementById('select-all-sections');
-const deselectAllBtn = document.getElementById('deselect-all-sections');
-const analyzeSelectedBtn = document.getElementById('analyze-selected');
 const mainContent = document.querySelector('.main-content');
 
 // Initialize sidebar event listeners
 function initializeSidebar() {
+    console.log('Initializing sidebar...');
+    
+    // Use document.querySelector as backup
+    const closeSidebarBtn = document.getElementById('close-sidebar') || document.querySelector('#close-sidebar');
+    const selectAllBtn = document.getElementById('select-all-sections') || document.querySelector('#select-all-sections');
+    const deselectAllBtn = document.getElementById('deselect-all-sections') || document.querySelector('#deselect-all-sections');
+    const analyzeSelectedBtn = document.getElementById('analyze-selected') || document.querySelector('#analyze-selected');
+    
+    console.log('Elements found:', {
+        closeSidebarBtn: !!closeSidebarBtn,
+        selectAllBtn: !!selectAllBtn, 
+        deselectAllBtn: !!deselectAllBtn,
+        analyzeSelectedBtn: !!analyzeSelectedBtn
+    });
+    
     if (closeSidebarBtn) {
         closeSidebarBtn.addEventListener('click', hideSidebar);
+        console.log('Close sidebar button listener added');
+    } else {
+        console.warn('Close sidebar button not found');
     }
 
     if (selectAllBtn) {
         selectAllBtn.addEventListener('click', selectAllSections);
+        console.log('Select all button listener added');
+    } else {
+        console.warn('Select all button not found');
     }
 
     if (deselectAllBtn) {
         deselectAllBtn.addEventListener('click', deselectAllSections);
+        console.log('Deselect all button listener added');
+    } else {
+        console.warn('Deselect all button not found');
     }
 
     if (analyzeSelectedBtn) {
-        analyzeSelectedBtn.addEventListener('click', analyzeSelectedSections);
+        // Add both click listener and a test
+        analyzeSelectedBtn.addEventListener('click', function(e) {
+            console.log('Button clicked via event listener!', e);
+            analyzeSelectedSections();
+        });
+        
+        // Test button accessibility
+        analyzeSelectedBtn.style.border = '2px solid red'; // Temporary visual indicator
+        setTimeout(() => {
+            if (analyzeSelectedBtn.style) {
+                analyzeSelectedBtn.style.border = '';
+            }
+        }, 2000);
+        
+        console.log('Analyze selected button listener added');
+        console.log('Button element:', analyzeSelectedBtn);
+        console.log('Button properties:', {
+            disabled: analyzeSelectedBtn.disabled,
+            style: analyzeSelectedBtn.style.display,
+            innerHTML: analyzeSelectedBtn.innerHTML
+        });
+    } else {
+        console.warn('Analyze selected button not found');
+        // Try to find it in a different way
+        setTimeout(() => {
+            const altBtn = document.querySelector('.analyze-btn');
+            console.log('Alternative search result:', altBtn);
+        }, 1000);
     }
 }
 
@@ -402,46 +449,69 @@ function updateSectionUI() {
 
 // Update analyze button state
 function updateAnalyzeButton() {
-    if (!analyzeSelectedBtn) return;
+    const analyzeBtn = document.getElementById('analyze-selected');
+    if (!analyzeBtn) return;
 
     const selectedCount = documentSections.filter(s => s.selected).length;
     
     if (selectedCount === 0) {
-        analyzeSelectedBtn.disabled = true;
-        analyzeSelectedBtn.innerHTML = '<i class="fas fa-brain"></i> Select sections to analyze';
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="fas fa-brain"></i> Select sections to analyze';
     } else {
-        analyzeSelectedBtn.disabled = false;
-        analyzeSelectedBtn.innerHTML = `<i class="fas fa-brain"></i> Analyze ${selectedCount} section${selectedCount > 1 ? 's' : ''}`;
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = `<i class="fas fa-brain"></i> Analyze ${selectedCount} section${selectedCount > 1 ? 's' : ''}`;
     }
 }
 
 // Analyze selected sections
 async function analyzeSelectedSections() {
+    console.log('Analyze button clicked!');
+    console.log('Document sections:', documentSections);
+    console.log('Current document:', currentDocument);
+    
     const selectedSections = documentSections.filter(s => s.selected);
+    console.log('Selected sections:', selectedSections);
     
     if (selectedSections.length === 0) {
         alert('Please select at least one section to analyze.');
         return;
     }
 
+    if (!currentDocument || !currentDocument.documentInfo) {
+        console.error('No current document or document info available');
+        addMessageToChat('assistant', 'Error: No document loaded. Please upload a document first.');
+        return;
+    }
+
     try {
         // Show loading state
-        analyzeSelectedBtn.disabled = true;
-        analyzeSelectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        const analyzeBtn = document.getElementById('analyze-selected');
+        if (analyzeBtn) {
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        }
+        
+        console.log('Sending request to analyze-sections...');
+
+        const requestData = {
+            selectedSections: selectedSections,
+            documentInfo: currentDocument.documentInfo,
+            userMessage: 'Please analyze the selected sections of this document'
+        };
+        
+        console.log('Request data:', requestData);
 
         const response = await fetch('/.netlify/functions/analyze-sections', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                selectedSections: selectedSections,
-                documentInfo: currentDocument.documentInfo,
-                userMessage: 'Please analyze the selected sections of this document'
-            })
+            body: JSON.stringify(requestData)
         });
 
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('Response data:', result);
 
         if (!response.ok) {
             throw new Error(result.error || `Analysis failed with status ${response.status}`);
