@@ -83,51 +83,73 @@ Error details: ${error.message}`;
   }
 }
 
-// Simple multipart parser for basic file uploads
+// Improved multipart parser for better binary handling
 function parseMultipart(body, boundary) {
-  const parts = body.split(`--${boundary}`);
-  const result = {};
-  
-  for (const part of parts) {
-    if (part.includes('Content-Disposition: form-data')) {
-      const lines = part.split('\r\n');
-      let name = '';
-      let filename = '';
-      let contentType = '';
-      let content = '';
-      
-      // Parse headers
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.includes('Content-Disposition')) {
-          const nameMatch = line.match(/name="([^"]+)"/);
-          const filenameMatch = line.match(/filename="([^"]+)"/);
-          if (nameMatch) name = nameMatch[1];
-          if (filenameMatch) filename = filenameMatch[1];
-        }
-        if (line.includes('Content-Type')) {
-          contentType = line.split(': ')[1];
-        }
-        if (line === '' && i < lines.length - 1) {
-          // Content starts after empty line
-          content = lines.slice(i + 1, -1).join('\r\n');
-          break;
-        }
+  try {
+    console.log('Parsing multipart with boundary:', boundary);
+    
+    // Convert body to buffer if it's a string
+    const bodyBuffer = Buffer.isBuffer(body) ? body : Buffer.from(body, 'binary');
+    const boundaryBuffer = Buffer.from(`--${boundary}`);
+    
+    // Split by boundary
+    const parts = [];
+    let start = 0;
+    let end = bodyBuffer.indexOf(boundaryBuffer, start);
+    
+    while (end !== -1) {
+      if (start !== 0) { // Skip the first empty part
+        parts.push(bodyBuffer.slice(start, end));
       }
+      start = end + boundaryBuffer.length;
+      end = bodyBuffer.indexOf(boundaryBuffer, start);
+    }
+    
+    const result = {};
+    
+    for (const part of parts) {
+      const partString = part.toString('binary');
       
-      if (name === 'document' && filename) {
-        result.document = {
-          filename,
-          contentType,
-          content: Buffer.from(content, 'binary')
-        };
-      } else if (name === 'message') {
-        result.message = content;
+      if (partString.includes('Content-Disposition: form-data')) {
+        const headerEndIndex = partString.indexOf('\r\n\r\n');
+        if (headerEndIndex === -1) continue;
+        
+        const headers = partString.substring(0, headerEndIndex);
+        const contentStart = headerEndIndex + 4;
+        const content = part.slice(contentStart, -2); // Remove trailing \r\n
+        
+        // Parse headers
+        let name = '';
+        let filename = '';
+        let contentType = '';
+        
+        const nameMatch = headers.match(/name="([^"]+)"/);
+        const filenameMatch = headers.match(/filename="([^"]+)"/);
+        const contentTypeMatch = headers.match(/Content-Type:\s*([^\r\n]+)/);
+        
+        if (nameMatch) name = nameMatch[1];
+        if (filenameMatch) filename = filenameMatch[1];
+        if (contentTypeMatch) contentType = contentTypeMatch[1];
+        
+        if (name === 'document' && filename) {
+          result.document = {
+            filename,
+            contentType,
+            content: content
+          };
+          console.log('Found document:', filename, 'Type:', contentType, 'Size:', content.length);
+        } else if (name === 'message') {
+          result.message = content.toString('utf-8');
+          console.log('Found message:', result.message);
+        }
       }
     }
+    
+    return result;
+  } catch (error) {
+    console.error('Multipart parsing error:', error);
+    throw new Error(`Failed to parse multipart data: ${error.message}`);
   }
-  
-  return result;
 }
 
 exports.handler = async (event, context) => {
@@ -158,7 +180,9 @@ exports.handler = async (event, context) => {
   try {
     console.log('Document handler called');
     console.log('Event body type:', typeof event.body);
+    console.log('Event body length:', event.body ? event.body.length : 'undefined');
     console.log('Content-Type:', event.headers['content-type'] || event.headers['Content-Type']);
+    console.log('Is base64 encoded:', event.isBase64Encoded);
     
     // Check if we have a body
     if (!event.body) {
@@ -169,19 +193,36 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Handle base64 encoded body
+    let bodyData = event.body;
+    if (event.isBase64Encoded) {
+      console.log('Decoding base64 body');
+      bodyData = Buffer.from(event.body, 'base64');
+    }
+
     // Parse multipart form data
     const contentType = event.headers['content-type'] || event.headers['Content-Type'];
-    const boundary = contentType.split('boundary=')[1];
+    if (!contentType || !contentType.includes('multipart/form-data')) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Content-Type must be multipart/form-data' }),
+      };
+    }
     
-    if (!boundary) {
+    const boundaryMatch = contentType.match(/boundary=([^;]+)/);
+    if (!boundaryMatch) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ error: 'No boundary found in content-type' }),
       };
     }
+    
+    const boundary = boundaryMatch[1];
+    console.log('Using boundary:', boundary);
 
-    const result = parseMultipart(event.body, boundary);
+    const result = parseMultipart(bodyData, boundary);
     console.log('Parsed result keys:', Object.keys(result));
     
     if (!result.document) {
@@ -189,7 +230,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'No document provided' }),
+        body: JSON.stringify({ error: 'No document found in upload' }),
       };
     }
 
