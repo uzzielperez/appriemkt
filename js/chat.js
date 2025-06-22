@@ -125,8 +125,8 @@ async function uploadFile() {
         formData.append('document', currentFile);
         formData.append('message', 'Please analyze this document');
 
-        // Upload file and get analysis
-        const uploadResponse = await fetch('/.netlify/functions/document-handler', {
+        // Upload file and get analysis (using debug endpoint)
+        const uploadResponse = await fetch('/.netlify/functions/debug-upload', {
             method: 'POST',
             body: formData
         });
@@ -143,7 +143,23 @@ async function uploadFile() {
         const result = await uploadResponse.json();
         console.log('Upload result:', result);
         
-        if (result.analysis) {
+        if (result.debug) {
+            // Display debug information
+            const debugInfo = `📊 **Debug Information**
+
+**File:** ${result.filename} (${result.contentType})
+**Text Length:** ${result.originalTextLength} characters
+**Extracted Text Preview:**
+${result.extractedTextPreview}
+
+**Prompt Preview:**
+${result.promptPreview}
+
+---
+This is debug output. The text extraction is working with ${result.originalTextLength} characters extracted.`;
+            
+            addMessageToChat('assistant', debugInfo);
+        } else if (result.analysis) {
             addMessageToChat('assistant', result.analysis);
         } else if (result.documentId) {
             addMessageToChat('assistant', 'Document uploaded successfully! You can now ask questions about it.');
@@ -188,8 +204,8 @@ async function sendMessage() {
             formData.append('document', currentFile);
             formData.append('message', message || 'Please analyze this document');
 
-            // Upload file and get analysis
-            const uploadResponse = await fetch('/.netlify/functions/document-handler', {
+            // Upload file and get analysis (using debug endpoint)
+            const uploadResponse = await fetch('/.netlify/functions/debug-upload', {
                 method: 'POST',
                 body: formData
             });
