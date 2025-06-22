@@ -710,6 +710,20 @@
         .section-item.selected {
             border-color: var(--primary-color);
             background-color: rgba(0, 128, 128, 0.1);
+            position: relative;
+        }
+
+        .section-item.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 150, 150, 0.15);
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .section-header {
@@ -965,6 +979,9 @@
             <button id="deselect-all-sections" class="control-btn">
                 <i class="fas fa-times-circle"></i> Deselect All
             </button>
+            <button id="clear-selection" class="control-btn">
+                <i class="fas fa-eraser"></i> Clear Selection
+            </button>
             <button id="analyze-selected" class="analyze-btn">
                 <i class="fas fa-brain"></i> Analyze Selected
             </button>
@@ -983,10 +1000,15 @@
         <div id="pdf-viewer-container" class="pdf-viewer-container" style="display: none;">
             <div class="pdf-viewer-header" id="pdfViewerHeader">
                 <div class="pdf-viewer-title">
-                    <i class="fas fa-grip-vertical" style="margin-right: 8px; cursor: move;" title="Drag to dock"></i>
                     <i class="fas fa-file-pdf"></i> PDF Viewer
                 </div>
                 <div class="pdf-controls">
+                    <button id="dock-left-btn" class="pdf-nav-btn" title="Dock to left">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button id="dock-right-btn" class="pdf-nav-btn" title="Dock to right">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                     <button id="prev-page" class="pdf-nav-btn">
                         <i class="fas fa-chevron-left"></i> Prev
                     </button>
@@ -1188,87 +1210,17 @@
                  });
              }
 
-            // PDF Viewer Drag-to-Dock functionality
-            const pdfViewerHeader = document.getElementById('pdfViewerHeader');
+            // PDF Viewer Dock functionality (simplified with buttons)
             const pdfViewerContainer = document.getElementById('pdf-viewer-container');
-            const leftDockIndicator = document.getElementById('leftDockIndicator');
-            const rightDockIndicator = document.getElementById('rightDockIndicator');
+            const dockLeftBtn = document.getElementById('dock-left-btn');
+            const dockRightBtn = document.getElementById('dock-right-btn');
             const mainContent = document.getElementById('mainContent');
             const documentSidebar = document.getElementById('document-sidebar');
 
-            if (pdfViewerHeader && pdfViewerContainer) {
-                let isDragging = false;
-                let dragStartX = 0;
-                let dragStartY = 0;
-                let hasMoved = false;
-
-                pdfViewerHeader.addEventListener('mousedown', (e) => {
-                    // Only start drag from the grip icon area
-                    if (e.target.classList.contains('fa-grip-vertical') || 
-                        e.target.closest('.pdf-viewer-title')) {
-                        isDragging = true;
-                        dragStartX = e.clientX;
-                        dragStartY = e.clientY;
-                        hasMoved = false;
-                        document.body.style.userSelect = 'none';
-                        e.preventDefault();
-                    }
-                });
-
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-
-                    const deltaX = Math.abs(e.clientX - dragStartX);
-                    const deltaY = Math.abs(e.clientY - dragStartY);
-                    
-                    // Only start showing indicators after significant movement
-                    if (deltaX > 10 || deltaY > 10) {
-                        hasMoved = true;
-                    }
-
-                    if (hasMoved) {
-                        // Show appropriate dock indicator based on mouse position
-                        const windowWidth = window.innerWidth;
-                        const mouseX = e.clientX;
-
-                        leftDockIndicator.style.display = 'none';
-                        rightDockIndicator.style.display = 'none';
-
-                        if (mouseX < windowWidth * 0.3) {
-                            leftDockIndicator.style.display = 'block';
-                        } else if (mouseX > windowWidth * 0.7) {
-                            rightDockIndicator.style.display = 'block';
-                        }
-                    }
-                });
-
-                document.addEventListener('mouseup', (e) => {
-                    if (!isDragging) return;
-
-                    const windowWidth = window.innerWidth;
-                    const mouseX = e.clientX;
-
-                    if (hasMoved) {
-                        // Determine docking action
-                        if (mouseX < windowWidth * 0.3) {
-                            // Dock to left
-                            dockPdfViewer('left');
-                        } else if (mouseX > windowWidth * 0.7) {
-                            // Dock to right
-                            dockPdfViewer('right');
-                        } else {
-                            // Return to sidebar
-                            undockPdfViewer();
-                        }
-                    }
-
-                    // Clean up
-                    isDragging = false;
-                    hasMoved = false;
-                    document.body.style.userSelect = '';
-                    leftDockIndicator.style.display = 'none';
-                    rightDockIndicator.style.display = 'none';
-                });
+            if (pdfViewerContainer && dockLeftBtn && dockRightBtn) {
+                // Simple button-based docking
+                dockLeftBtn.addEventListener('click', () => dockPdfViewer('left'));
+                dockRightBtn.addEventListener('click', () => dockPdfViewer('right'));
 
                 function dockPdfViewer(side) {
                     // Remove from sidebar
@@ -1282,7 +1234,9 @@
                     // Adjust main content
                     mainContent.classList.add(`pdf-docked-${side}`);
 
-                    // Add undock button to header
+                    // Hide dock buttons and add undock button
+                    dockLeftBtn.style.display = 'none';
+                    dockRightBtn.style.display = 'none';
                     addUndockButton();
                 }
 
@@ -1296,7 +1250,9 @@
                     documentSidebar.appendChild(pdfViewerContainer);
                     pdfViewerContainer.style.display = 'flex';
 
-                    // Remove undock button
+                    // Show dock buttons and remove undock button
+                    dockLeftBtn.style.display = 'inline-flex';
+                    dockRightBtn.style.display = 'inline-flex';
                     removeUndockButton();
                 }
 
@@ -1306,9 +1262,8 @@
                     const undockButton = document.createElement('button');
                     undockButton.id = 'undockButton';
                     undockButton.className = 'pdf-nav-btn';
-                    undockButton.innerHTML = '<i class="fas fa-times"></i> Undock';
+                    undockButton.innerHTML = '<i class="fas fa-window-minimize"></i> Return';
                     undockButton.title = 'Return to sidebar';
-                    undockButton.style.marginLeft = 'auto';
 
                     undockButton.addEventListener('click', undockPdfViewer);
 
@@ -1322,13 +1277,54 @@
                         undockButton.remove();
                     }
                 }
+            }
 
-                // Add double-click to undock when docked
-                pdfViewerHeader.addEventListener('dblclick', () => {
-                    if (pdfViewerContainer.classList.contains('docked')) {
-                        undockPdfViewer();
-                    }
+            // Enhanced section selection with clear functionality
+            const clearSelectionBtn = document.getElementById('clear-selection');
+            if (clearSelectionBtn) {
+                clearSelectionBtn.addEventListener('click', () => {
+                    // Clear all section selections
+                    const allCheckboxes = document.querySelectorAll('.section-checkbox');
+                    allCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        const sectionItem = checkbox.closest('.section-item');
+                        if (sectionItem) {
+                            sectionItem.classList.remove('selected');
+                        }
+                    });
+
+                    // Update analyze button
+                    updateAnalyzeButton();
                 });
+            }
+
+            // Add click-to-deselect functionality for individual sections
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('section-item') && e.target.classList.contains('selected')) {
+                    // Allow clicking on selected section to deselect it
+                    const checkbox = e.target.querySelector('.section-checkbox');
+                    if (checkbox && !e.target.closest('.section-checkbox')) {
+                        checkbox.checked = false;
+                        e.target.classList.remove('selected');
+                        updateAnalyzeButton();
+                    }
+                }
+            });
+
+            // Function to update analyze button state
+            function updateAnalyzeButton() {
+                const analyzeBtn = document.getElementById('analyze-selected');
+                const selectedSections = document.querySelectorAll('.section-checkbox:checked');
+                
+                if (analyzeBtn) {
+                    if (selectedSections.length > 0) {
+                        analyzeBtn.textContent = `Analyze ${selectedSections.length} section${selectedSections.length > 1 ? 's' : ''}`;
+                        analyzeBtn.disabled = false;
+                    } else {
+                        analyzeBtn.textContent = 'Select sections to analyze';
+                        analyzeBtn.disabled = true;
+                    }
+                }
             }
         });
             
