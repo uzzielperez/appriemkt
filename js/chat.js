@@ -5,6 +5,17 @@ let currentFile = null;
 let currentDocument = null;
 let documentSections = [];
 
+// PDF viewer variables
+let pdfDoc = null;
+let currentPage = 1;
+let canvas = null;
+let ctx = null;
+let isSelecting = false;
+let startX = 0;
+let startY = 0;
+let selectionBox = null;
+let selectedArea = null;
+
 // Drag and drop functionality
 function setupDragAndDrop() {
     const searchInput = document.getElementById('searchInput');
@@ -78,6 +89,11 @@ function handleFileSelection(file) {
         <i class="fas fa-times remove-file" onclick="removeFile()"></i>
     `;
     
+    // If it's a PDF, load it into the viewer
+    if (file.type === 'application/pdf') {
+        loadPDF(file);
+    }
+    
     // Add a message to the chat
     addMessageToChat('user', `📎 File selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 }
@@ -86,6 +102,7 @@ function handleFileSelection(file) {
 document.addEventListener('DOMContentLoaded', function() {
     setupDragAndDrop();
     initializeSidebar();
+    initializePDFViewer();
 });
 
 document.getElementById('attachment-button').addEventListener('click', () => {
@@ -225,6 +242,243 @@ async function sendMessage() {
 }
 
 // Helper function to add messages to chat
+// PDF Viewer Functions
+function initializePDFViewer() {
+    canvas = document.getElementById('pdf-canvas');
+    ctx = canvas.getContext('2d');
+    
+    // PDF navigation
+    document.getElementById('prev-page').addEventListener('click', showPrevPage);
+    document.getElementById('next-page').addEventListener('click', showNextPage);
+    
+    // Canvas mouse events for selection
+    canvas.addEventListener('mousedown', startSelection);
+    canvas.addEventListener('mousemove', updateSelection);
+    canvas.addEventListener('mouseup', endSelection);
+    
+    // Analyze selection button
+    document.getElementById('analyze-selection').addEventListener('click', analyzeSelection);
+}
+
+async function loadPDF(file) {
+    try {
+        // Show PDF viewer
+        document.getElementById('pdf-viewer-container').style.display = 'flex';
+        
+        const arrayBuffer = await file.arrayBuffer();
+        
+        // Use PDF.js to load the document
+        // Note: Since we're loading as module, we need to use dynamic import
+        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs');
+        
+        // Set worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+        
+        pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+        currentPage = 1;
+        
+        await renderPage(currentPage);
+        updatePageInfo();
+        updateNavButtons();
+        
+    } catch (error) {
+        console.error('Error loading PDF:', error);
+        addMessageToChat('assistant', 'Sorry, there was an error loading the PDF. Please try again.');
+    }
+}
+
+async function renderPage(pageNum) {
+    if (!pdfDoc) return;
+    
+    try {
+        const page = await pdfDoc.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
+        
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+        };
+        
+        await page.render(renderContext).promise;
+        
+        // Clear any existing selection
+        clearSelection();
+        
+    } catch (error) {
+        console.error('Error rendering page:', error);
+    }
+}
+
+function showPrevPage() {
+    if (currentPage <= 1) return;
+    currentPage--;
+    renderPage(currentPage);
+    updatePageInfo();
+    updateNavButtons();
+}
+
+function showNextPage() {
+    if (!pdfDoc || currentPage >= pdfDoc.numPages) return;
+    currentPage++;
+    renderPage(currentPage);
+    updatePageInfo();
+    updateNavButtons();
+}
+
+function updatePageInfo() {
+    const pageInfo = document.getElementById('page-info');
+    if (pdfDoc) {
+        pageInfo.textContent = `Page ${currentPage} of ${pdfDoc.numPages}`;
+    }
+}
+
+function updateNavButtons() {
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = !pdfDoc || currentPage >= pdfDoc.numPages;
+}
+
+function startSelection(e) {
+    const rect = canvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    isSelecting = true;
+    
+    // Clear previous selection
+    clearSelection();
+}
+
+function updateSelection(e) {
+    if (!isSelecting) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    
+    // Clear previous selection box
+    if (selectionBox) {
+        selectionBox.remove();
+    }
+    
+    // Create selection box
+    selectionBox = document.createElement('div');
+    selectionBox.className = 'selection-overlay';
+    
+    const left = Math.min(startX, currentX);
+    const top = Math.min(startY, currentY);
+    const width = Math.abs(currentX - startX);
+    const height = Math.abs(currentY - startY);
+    
+    selectionBox.style.left = (rect.left + left) + 'px';
+    selectionBox.style.top = (rect.top + top) + 'px';
+    selectionBox.style.width = width + 'px';
+    selectionBox.style.height = height + 'px';
+    
+    document.body.appendChild(selectionBox);
+}
+
+function endSelection(e) {
+    if (!isSelecting) return;
+    
+    isSelecting = false;
+    
+    const rect = canvas.getBoundingClientRect();
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+    
+    // Store selected area coordinates
+    selectedArea = {
+        x1: Math.min(startX, endX),
+        y1: Math.min(startY, endY),
+        x2: Math.max(startX, endX),
+        y2: Math.max(startY, endY),
+        page: currentPage
+    };
+    
+    // Show selection info
+    showSelectionInfo();
+}
+
+function clearSelection() {
+    if (selectionBox) {
+        selectionBox.remove();
+        selectionBox = null;
+    }
+    selectedArea = null;
+    document.getElementById('selected-area-info').style.display = 'none';
+}
+
+function showSelectionInfo() {
+    if (!selectedArea) return;
+    
+    const info = document.getElementById('selected-area-info');
+    const width = selectedArea.x2 - selectedArea.x1;
+    const height = selectedArea.y2 - selectedArea.y1;
+    
+    info.innerHTML = `
+        <div>Selected area: ${width.toFixed(0)}×${height.toFixed(0)}px on page ${selectedArea.page}</div>
+        <button id="analyze-selection" class="analyze-selection-btn" onclick="analyzeSelection()">
+            <i class="fas fa-brain"></i> Analyze Selection
+        </button>
+    `;
+    info.style.display = 'block';
+}
+
+async function analyzeSelection() {
+    if (!selectedArea || !currentFile) {
+        addMessageToChat('assistant', 'No area selected or no PDF loaded.');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const analyzeBtn = document.getElementById('analyze-selection');
+        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        analyzeBtn.disabled = true;
+        
+        // Create FormData with selection coordinates
+        const formData = new FormData();
+        formData.append('document', currentFile);
+        formData.append('selectionArea', JSON.stringify(selectedArea));
+        formData.append('message', `Please analyze the selected area on page ${selectedArea.page}`);
+        
+        const response = await fetch('/.netlify/functions/analyze-selection', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Analysis failed: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.analysis) {
+            addMessageToChat('assistant', result.analysis);
+            addMessageToChat('system', `📍 **Analyzed selected area:** ${(selectedArea.x2 - selectedArea.x1).toFixed(0)}×${(selectedArea.y2 - selectedArea.y1).toFixed(0)}px on page ${selectedArea.page}`);
+        }
+        
+        // Clear selection
+        clearSelection();
+        
+    } catch (error) {
+        console.error('Error analyzing selection:', error);
+        addMessageToChat('assistant', 'Sorry, there was an error analyzing the selected area. Please try again.');
+    } finally {
+        // Reset button
+        const analyzeBtn = document.getElementById('analyze-selection');
+        if (analyzeBtn) {
+            analyzeBtn.innerHTML = '<i class="fas fa-brain"></i> Analyze Selection';
+            analyzeBtn.disabled = false;
+        }
+    }
+}
+
 function addMessageToChat(sender, message) {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageDiv = document.createElement('div');
@@ -351,6 +605,11 @@ function showSidebar(documentData) {
 
     // Populate sections
     populateSections(documentData.sections);
+
+    // Show PDF viewer if it's a PDF file
+    if (currentFile && currentFile.type === 'application/pdf') {
+        loadPDF(currentFile);
+    }
 
     // Show sidebar
     if (documentSidebar) {
