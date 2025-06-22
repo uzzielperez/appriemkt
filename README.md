@@ -62,15 +62,50 @@ The AI provides comprehensive analysis including:
 - Summary of key information
 - Contextual insights based on document content
 
+### PDF Viewer with Area Selection
+Apprie now includes an advanced PDF viewer with interactive selection capabilities:
+
+- **📄 High-Quality PDF Rendering**: Uses PDF.js for professional document display
+- **🖱️ Interactive Navigation**: Page-by-page browsing with Previous/Next controls
+- **🎯 Drag-to-Select Areas**: Draw selection boxes on any part of the PDF
+- **🧠 Area-Specific Analysis**: Analyze only the selected portion of the document
+- **📱 Responsive Design**: Works seamlessly across desktop and mobile devices
+- **🔄 Dual Analysis Options**: Choose between section-based or area-based analysis
+
+### How to Use PDF Viewer
+1. Upload a PDF document using the paperclip icon
+2. The document sidebar will open showing both sections and the PDF viewer
+3. Navigate through pages using the controls
+4. Click and drag on the PDF to select specific areas
+5. Click "Analyze Selection" to get AI analysis of just that area
+
 ### Technical Implementation
-- **Backend**: Netlify serverless function (`/netlify/functions/document-handler.js`)
+- **Backend**: Multiple Netlify serverless functions:
+  - `/netlify/functions/document-parser.js` - Document parsing and section detection
+  - `/netlify/functions/analyze-sections.js` - Section-based analysis
+  - `/netlify/functions/analyze-selection.js` - Area-based analysis
 - **AI Processing**: Groq's allam-2-7b model
+- **PDF Rendering**: PDF.js library for client-side rendering
 - **Text Extraction**: 
-  - PDF: `pdf-parse` library for accurate text extraction
+  - PDF: Enhanced 5-strategy extraction with coordinate mapping
   - Text: Direct UTF-8 encoding
   - Word: Basic text extraction with character filtering
-- **Content Limits**: Documents are processed up to ~8000 characters for optimal performance
+- **Content Limits**: Documents are processed up to ~6000 characters for optimal performance
 - **Error Handling**: Comprehensive error reporting for unsupported formats or parsing failures
+
+### 🛡️ Privacy & Security Excellence
+**Your data is completely secure with Apprie:**
+
+✅ **GDPR/Privacy Compliant** - No user data stored  
+✅ **Zero Data Retention** - Files processed and immediately discarded  
+✅ **Session-Based Only** - Everything cleared between sessions  
+✅ **Memory-Only Processing** - No disk writes or persistent storage  
+
+**How it works:**
+- Files are processed entirely in memory during the HTTP request
+- No databases, file systems, or persistent storage used
+- All data is automatically garbage collected after analysis
+- Each session is completely isolated and temporary
 
 ## Prerequisites
 - Node.js (v23.3.0+)

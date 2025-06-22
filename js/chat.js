@@ -91,7 +91,10 @@ function handleFileSelection(file) {
     
     // If it's a PDF, load it into the viewer
     if (file.type === 'application/pdf') {
+        console.log('PDF file detected, attempting to load into viewer');
         loadPDF(file);
+    } else {
+        console.log('Non-PDF file, type:', file.type);
     }
     
     // Add a message to the chat
@@ -103,6 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDragAndDrop();
     initializeSidebar();
     initializePDFViewer();
+    
+    // Debug function to test PDF viewer visibility
+    window.testPDFViewer = function() {
+        console.log('Testing PDF viewer visibility...');
+        const container = document.getElementById('pdf-viewer-container');
+        if (container) {
+            container.style.display = 'flex';
+            console.log('PDF viewer container shown manually');
+        } else {
+            console.error('PDF viewer container not found!');
+        }
+    };
 });
 
 document.getElementById('attachment-button').addEventListener('click', () => {
@@ -262,28 +277,50 @@ function initializePDFViewer() {
 
 async function loadPDF(file) {
     try {
+        console.log('Loading PDF:', file.name);
+        
         // Show PDF viewer
-        document.getElementById('pdf-viewer-container').style.display = 'flex';
+        const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+        if (pdfViewerContainer) {
+            pdfViewerContainer.style.display = 'flex';
+            console.log('PDF viewer container shown');
+        } else {
+            console.error('PDF viewer container not found');
+            return;
+        }
         
         const arrayBuffer = await file.arrayBuffer();
+        console.log('PDF arrayBuffer loaded, size:', arrayBuffer.byteLength);
         
-        // Use PDF.js to load the document
-        // Note: Since we're loading as module, we need to use dynamic import
-        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs');
-        
-        // Set worker path
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
-        
-        pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
-        currentPage = 1;
-        
-        await renderPage(currentPage);
-        updatePageInfo();
-        updateNavButtons();
+        // Set worker path for PDF.js
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            // Load the PDF document
+            const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+            pdfDoc = await loadingTask.promise;
+            currentPage = 1;
+            
+            console.log('PDF loaded, pages:', pdfDoc.numPages);
+            
+            await renderPage(currentPage);
+            updatePageInfo();
+            updateNavButtons();
+            
+            console.log('PDF rendering complete');
+        } else {
+            throw new Error('PDF.js library not loaded');
+        }
         
     } catch (error) {
         console.error('Error loading PDF:', error);
-        addMessageToChat('assistant', 'Sorry, there was an error loading the PDF. Please try again.');
+        addMessageToChat('assistant', `Sorry, there was an error loading the PDF: ${error.message}. Please try again.`);
+        
+        // Hide PDF viewer on error
+        const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+        if (pdfViewerContainer) {
+            pdfViewerContainer.style.display = 'none';
+        }
     }
 }
 
