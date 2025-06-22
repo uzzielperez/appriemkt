@@ -1,7 +1,9 @@
 // Existing chat.js code...
 
-// File upload handling
+// Global variables for document handling
 let currentFile = null;
+let currentDocument = null;
+let documentSections = [];
 
 // Drag and drop functionality
 function setupDragAndDrop() {
@@ -83,6 +85,7 @@ function handleFileSelection(file) {
 // Initialize drag and drop when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setupDragAndDrop();
+    initializeSidebar();
 });
 
 document.getElementById('attachment-button').addEventListener('click', () => {
@@ -117,51 +120,18 @@ async function uploadFile() {
             uploadBtn.disabled = true;
         }
         
-        // Add user message indicating file upload
-        addMessageToChat('user', `📎 Uploaded: ${currentFile.name}`);
+        // Use the enhanced file upload that shows sections
+        const result = await handleFileUpload(currentFile, 'Please analyze this document');
         
-        // Create FormData and append file
-        const formData = new FormData();
-        formData.append('document', currentFile);
-        formData.append('message', 'Please analyze this document');
-
-        // Upload file and get analysis
-        const uploadResponse = await fetch('/.netlify/functions/document-handler', {
-            method: 'POST',
-            body: formData
-        });
-
-        console.log('Upload response status:', uploadResponse.status);
-        console.log('Upload response headers:', uploadResponse.headers);
-
-        if (!uploadResponse.ok) {
-            const errorText = await uploadResponse.text();
-            console.error('Server error response:', errorText);
-            throw new Error(`File upload failed: ${uploadResponse.status} - ${errorText}`);
+        // Clear the file upload if successful
+        if (result) {
+            removeFile();
         }
-
-        const result = await uploadResponse.json();
-        console.log('Upload result:', result);
-        
-        if (result.analysis) {
-            addMessageToChat('assistant', result.analysis);
-            
-            // Add file info if available
-            if (result.documentInfo) {
-                const info = result.documentInfo;
-                addMessageToChat('system', `📄 **Document processed:** ${info.filename} (${info.contentType}, ${info.textLength} characters extracted)`);
-            }
-        } else {
-            throw new Error('No analysis received from server');
-        }
-
-        // Clear the file upload
-        removeFile();
         
     } catch (error) {
         console.error('Error:', error);
         addMessageToChat('assistant', 'Sorry, there was an error uploading your file. Please try again.');
-        
+    } finally {
         // Reset upload button
         const uploadBtn = document.querySelector('.upload-file-btn');
         if (uploadBtn) {
@@ -259,9 +229,18 @@ function addMessageToChat(sender, message) {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
-    messageDiv.textContent = message;
+    
+    // Handle markdown/html content for system messages
+    if (sender === 'system') {
+        messageDiv.innerHTML = message;
+    } else {
+        messageDiv.textContent = message;
+    }
+    
     messagesContainer.appendChild(messageDiv);
     messageDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    return messageDiv; // Return the element so it can be removed if needed
 }
 
 // Add click and enter key handlers for the submit button
@@ -273,4 +252,263 @@ document.getElementById('searchInput').addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
+
+// Sidebar functionality
+const documentSidebar = document.getElementById('document-sidebar');
+const closeSidebarBtn = document.getElementById('close-sidebar');
+const documentTitle = document.getElementById('document-title');
+const documentStats = document.getElementById('document-stats');
+const documentSectionsContainer = document.getElementById('document-sections');
+const selectAllBtn = document.getElementById('select-all-sections');
+const deselectAllBtn = document.getElementById('deselect-all-sections');
+const analyzeSelectedBtn = document.getElementById('analyze-selected');
+const mainContent = document.querySelector('.main-content');
+
+// Initialize sidebar event listeners
+function initializeSidebar() {
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', hideSidebar);
+    }
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', selectAllSections);
+    }
+
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', deselectAllSections);
+    }
+
+    if (analyzeSelectedBtn) {
+        analyzeSelectedBtn.addEventListener('click', analyzeSelectedSections);
+    }
+}
+
+// Show sidebar with document
+function showSidebar(documentData) {
+    currentDocument = documentData;
+    documentSections = documentData.sections;
+
+    // Update document info
+    if (documentTitle) {
+        documentTitle.textContent = documentData.documentInfo.filename;
+    }
+
+    if (documentStats) {
+        const stats = documentData.documentInfo;
+        documentStats.innerHTML = `
+            <div><i class="fas fa-file-alt"></i> ${stats.sectionCount} sections</div>
+            <div><i class="fas fa-align-left"></i> ${stats.wordCount.toLocaleString()} words</div>
+            <div><i class="fas fa-text-width"></i> ${stats.totalLength.toLocaleString()} characters</div>
+        `;
+    }
+
+    // Populate sections
+    populateSections(documentData.sections);
+
+    // Show sidebar
+    if (documentSidebar) {
+        documentSidebar.classList.remove('hidden');
+    }
+    if (mainContent) {
+        mainContent.classList.add('sidebar-open');
+    }
+}
+
+// Hide sidebar
+function hideSidebar() {
+    if (documentSidebar) {
+        documentSidebar.classList.add('hidden');
+    }
+    if (mainContent) {
+        mainContent.classList.remove('sidebar-open');
+    }
+    
+    // Clear current document
+    currentDocument = null;
+    documentSections = [];
+}
+
+// Populate sections in sidebar
+function populateSections(sections) {
+    if (!documentSectionsContainer) return;
+
+    documentSectionsContainer.innerHTML = '';
+
+    sections.forEach((section, index) => {
+        const sectionElement = document.createElement('div');
+        sectionElement.className = 'section-item';
+        sectionElement.innerHTML = `
+            <div class="section-header">
+                <input type="checkbox" class="section-checkbox" id="section-${section.id}" 
+                       ${section.selected ? 'checked' : ''} data-section-id="${section.id}">
+                <label for="section-${section.id}" class="section-title">${section.title}</label>
+            </div>
+            <div class="section-info">
+                ${section.wordCount} words • ${section.charCount} characters
+            </div>
+            <div class="section-preview">${section.preview}</div>
+        `;
+
+        // Add event listener for checkbox
+        const checkbox = sectionElement.querySelector('.section-checkbox');
+        checkbox.addEventListener('change', function() {
+            section.selected = this.checked;
+            sectionElement.classList.toggle('selected', this.checked);
+            updateAnalyzeButton();
+        });
+
+        // Set initial selected state
+        if (section.selected) {
+            sectionElement.classList.add('selected');
+        }
+
+        documentSectionsContainer.appendChild(sectionElement);
+    });
+
+    updateAnalyzeButton();
+}
+
+// Select all sections
+function selectAllSections() {
+    documentSections.forEach(section => {
+        section.selected = true;
+    });
+    updateSectionUI();
+    updateAnalyzeButton();
+}
+
+// Deselect all sections
+function deselectAllSections() {
+    documentSections.forEach(section => {
+        section.selected = false;
+    });
+    updateSectionUI();
+    updateAnalyzeButton();
+}
+
+// Update section UI based on selection state
+function updateSectionUI() {
+    const checkboxes = document.querySelectorAll('.section-checkbox');
+    checkboxes.forEach(checkbox => {
+        const sectionId = checkbox.dataset.sectionId;
+        const section = documentSections.find(s => s.id === sectionId);
+        if (section) {
+            checkbox.checked = section.selected;
+            const sectionElement = checkbox.closest('.section-item');
+            sectionElement.classList.toggle('selected', section.selected);
+        }
+    });
+}
+
+// Update analyze button state
+function updateAnalyzeButton() {
+    if (!analyzeSelectedBtn) return;
+
+    const selectedCount = documentSections.filter(s => s.selected).length;
+    
+    if (selectedCount === 0) {
+        analyzeSelectedBtn.disabled = true;
+        analyzeSelectedBtn.innerHTML = '<i class="fas fa-brain"></i> Select sections to analyze';
+    } else {
+        analyzeSelectedBtn.disabled = false;
+        analyzeSelectedBtn.innerHTML = `<i class="fas fa-brain"></i> Analyze ${selectedCount} section${selectedCount > 1 ? 's' : ''}`;
+    }
+}
+
+// Analyze selected sections
+async function analyzeSelectedSections() {
+    const selectedSections = documentSections.filter(s => s.selected);
+    
+    if (selectedSections.length === 0) {
+        alert('Please select at least one section to analyze.');
+        return;
+    }
+
+    try {
+        // Show loading state
+        analyzeSelectedBtn.disabled = true;
+        analyzeSelectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+        const response = await fetch('/.netlify/functions/analyze-sections', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                selectedSections: selectedSections,
+                documentInfo: currentDocument.documentInfo,
+                userMessage: 'Please analyze the selected sections of this document'
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || `Analysis failed with status ${response.status}`);
+        }
+
+        // Add analysis to chat
+        addMessageToChat('assistant', result.analysis);
+        
+        // Add info about what was analyzed
+        const analysisInfo = `📊 **Analysis Complete**: Analyzed ${result.analyzedSections} section${result.analyzedSections > 1 ? 's' : ''} (${result.totalCharactersAnalyzed.toLocaleString()} characters) from ${currentDocument.documentInfo.filename}`;
+        addMessageToChat('system', analysisInfo);
+
+        // Hide sidebar after successful analysis
+        hideSidebar();
+
+    } catch (error) {
+        console.error('Analysis error:', error);
+        addMessageToChat('assistant', `Sorry, there was an error analyzing the selected sections: ${error.message}`);
+    } finally {
+        // Reset button state
+        updateAnalyzeButton();
+    }
+}
+
+// Enhanced file upload to use document parser
+async function handleFileUpload(file, userMessage = '') {
+    try {
+        console.log('Uploading file for parsing:', file.name);
+        
+        const formData = new FormData();
+        formData.append('document', file);
+        
+        // Show upload progress message
+        const uploadMsg = addMessageToChat('system', `📤 Uploading and parsing ${file.name}...`);
+
+        const response = await fetch('/.netlify/functions/document-parser', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        // Remove upload message
+        if (uploadMsg && uploadMsg.parentNode) {
+            uploadMsg.parentNode.removeChild(uploadMsg);
+        }
+
+        if (!response.ok) {
+            throw new Error(result.error || `Upload failed with status ${response.status}`);
+        }
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to parse document');
+        }
+
+        // Show success message
+        addMessageToChat('system', `✅ **Document parsed successfully!** Found ${result.sections.length} sections. Use the sidebar to select which sections to analyze.`);
+
+        // Show sidebar with parsed document
+        showSidebar(result);
+
+        return result;
+
+    } catch (error) {
+        console.error('File upload error:', error);
+        addMessageToChat('assistant', `Sorry, there was an error uploading your file: ${error.message}`);
+        return null;
+    }
+}
 
