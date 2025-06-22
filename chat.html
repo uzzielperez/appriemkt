@@ -764,6 +764,58 @@
             flex-direction: column;
             overflow: hidden;
             min-height: 0;
+            position: relative;
+        }
+
+        .pdf-viewer-container.docked {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 50vw;
+            z-index: 1000;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .pdf-viewer-container.docked-left {
+            left: 0;
+            border-right: 2px solid var(--primary-color);
+        }
+
+        .pdf-viewer-container.docked-right {
+            right: 0;
+            border-left: 2px solid var(--primary-color);
+        }
+
+        /* Adjust main content when PDF is docked */
+        .main-content.pdf-docked-left {
+            margin-left: 50vw;
+        }
+
+        .main-content.pdf-docked-right {
+            margin-right: 50vw;
+        }
+
+        /* Dock indicators */
+        .dock-indicator {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 50vw;
+            background-color: rgba(0, 128, 128, 0.2);
+            border: 2px dashed var(--primary-color);
+            display: none;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .dock-indicator.left {
+            left: 0;
+        }
+
+        .dock-indicator.right {
+            right: 0;
         }
 
         .pdf-viewer-header {
@@ -929,8 +981,9 @@
 
         <!-- PDF Viewer -->
         <div id="pdf-viewer-container" class="pdf-viewer-container" style="display: none;">
-            <div class="pdf-viewer-header">
+            <div class="pdf-viewer-header" id="pdfViewerHeader">
                 <div class="pdf-viewer-title">
+                    <i class="fas fa-grip-vertical" style="margin-right: 8px; cursor: move;" title="Drag to dock"></i>
                     <i class="fas fa-file-pdf"></i> PDF Viewer
                 </div>
                 <div class="pdf-controls">
@@ -955,8 +1008,12 @@
         </div>
     </div>
 
+    <!-- Dock Indicators -->
+    <div class="dock-indicator left" id="leftDockIndicator"></div>
+    <div class="dock-indicator right" id="rightDockIndicator"></div>
+
     <!-- Main Content Container -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <div class="logo-container">
         <img src="assets/img/fingerprint-icon.svg" alt="Apprie Logo" class="logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot; fill=&quot;%23fff&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;45&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 25C36.2 25 25 36.2 25 50C25 63.8 36.2 75 50 75&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 35C41.7 35 35 41.7 35 50C35 58.3 41.7 65 50 65&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><path d=&quot;M50 45C47.2 45 45 47.2 45 50C45 52.8 47.2 55 50 55&quot; fill=&quot;none&quot; stroke=&quot;%23fff&quot; stroke-width=&quot;4&quot;/><circle cx=&quot;60&quot; cy=&quot;50&quot; r=&quot;5&quot; /></svg>'">
         <h1 class="app-title">Apprie</h1>
@@ -1127,10 +1184,153 @@
                             } else if (textarea === chatInput) {
                                 chatSendButton.click();
                             }
+                                             }
+                 });
+             }
+
+            // PDF Viewer Drag-to-Dock functionality
+            const pdfViewerHeader = document.getElementById('pdfViewerHeader');
+            const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+            const leftDockIndicator = document.getElementById('leftDockIndicator');
+            const rightDockIndicator = document.getElementById('rightDockIndicator');
+            const mainContent = document.getElementById('mainContent');
+            const documentSidebar = document.getElementById('document-sidebar');
+
+            if (pdfViewerHeader && pdfViewerContainer) {
+                let isDragging = false;
+                let dragStartX = 0;
+                let dragStartY = 0;
+                let hasMoved = false;
+
+                pdfViewerHeader.addEventListener('mousedown', (e) => {
+                    // Only start drag from the grip icon area
+                    if (e.target.classList.contains('fa-grip-vertical') || 
+                        e.target.closest('.pdf-viewer-title')) {
+                        isDragging = true;
+                        dragStartX = e.clientX;
+                        dragStartY = e.clientY;
+                        hasMoved = false;
+                        document.body.style.userSelect = 'none';
+                        e.preventDefault();
+                    }
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+
+                    const deltaX = Math.abs(e.clientX - dragStartX);
+                    const deltaY = Math.abs(e.clientY - dragStartY);
+                    
+                    // Only start showing indicators after significant movement
+                    if (deltaX > 10 || deltaY > 10) {
+                        hasMoved = true;
+                    }
+
+                    if (hasMoved) {
+                        // Show appropriate dock indicator based on mouse position
+                        const windowWidth = window.innerWidth;
+                        const mouseX = e.clientX;
+
+                        leftDockIndicator.style.display = 'none';
+                        rightDockIndicator.style.display = 'none';
+
+                        if (mouseX < windowWidth * 0.3) {
+                            leftDockIndicator.style.display = 'block';
+                        } else if (mouseX > windowWidth * 0.7) {
+                            rightDockIndicator.style.display = 'block';
                         }
-                    });
+                    }
+                });
+
+                document.addEventListener('mouseup', (e) => {
+                    if (!isDragging) return;
+
+                    const windowWidth = window.innerWidth;
+                    const mouseX = e.clientX;
+
+                    if (hasMoved) {
+                        // Determine docking action
+                        if (mouseX < windowWidth * 0.3) {
+                            // Dock to left
+                            dockPdfViewer('left');
+                        } else if (mouseX > windowWidth * 0.7) {
+                            // Dock to right
+                            dockPdfViewer('right');
+                        } else {
+                            // Return to sidebar
+                            undockPdfViewer();
+                        }
+                    }
+
+                    // Clean up
+                    isDragging = false;
+                    hasMoved = false;
+                    document.body.style.userSelect = '';
+                    leftDockIndicator.style.display = 'none';
+                    rightDockIndicator.style.display = 'none';
+                });
+
+                function dockPdfViewer(side) {
+                    // Remove from sidebar
+                    pdfViewerContainer.remove();
+                    
+                    // Add to body as docked
+                    document.body.appendChild(pdfViewerContainer);
+                    pdfViewerContainer.classList.add('docked', `docked-${side}`);
+                    pdfViewerContainer.style.display = 'flex';
+
+                    // Adjust main content
+                    mainContent.classList.add(`pdf-docked-${side}`);
+
+                    // Add undock button to header
+                    addUndockButton();
                 }
-            });
+
+                function undockPdfViewer() {
+                    // Remove docking classes
+                    pdfViewerContainer.classList.remove('docked', 'docked-left', 'docked-right');
+                    mainContent.classList.remove('pdf-docked-left', 'pdf-docked-right');
+
+                    // Remove from body and return to sidebar
+                    pdfViewerContainer.remove();
+                    documentSidebar.appendChild(pdfViewerContainer);
+                    pdfViewerContainer.style.display = 'flex';
+
+                    // Remove undock button
+                    removeUndockButton();
+                }
+
+                function addUndockButton() {
+                    if (document.getElementById('undockButton')) return;
+
+                    const undockButton = document.createElement('button');
+                    undockButton.id = 'undockButton';
+                    undockButton.className = 'pdf-nav-btn';
+                    undockButton.innerHTML = '<i class="fas fa-times"></i> Undock';
+                    undockButton.title = 'Return to sidebar';
+                    undockButton.style.marginLeft = 'auto';
+
+                    undockButton.addEventListener('click', undockPdfViewer);
+
+                    const pdfControls = pdfViewerContainer.querySelector('.pdf-controls');
+                    pdfControls.appendChild(undockButton);
+                }
+
+                function removeUndockButton() {
+                    const undockButton = document.getElementById('undockButton');
+                    if (undockButton) {
+                        undockButton.remove();
+                    }
+                }
+
+                // Add double-click to undock when docked
+                pdfViewerHeader.addEventListener('dblclick', () => {
+                    if (pdfViewerContainer.classList.contains('docked')) {
+                        undockPdfViewer();
+                    }
+                });
+            }
+        });
             
             // Category selection
             categories.forEach(category => {
