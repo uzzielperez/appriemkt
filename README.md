@@ -64,7 +64,7 @@ The AI provides comprehensive analysis including:
 
 ### Technical Implementation
 - **Backend**: Netlify serverless function (`/netlify/functions/document-handler.js`)
-- **AI Processing**: Groq's mixtral-8x7b-32768 model
+- **AI Processing**: Groq's allam-2-7b model
 - **Text Extraction**: 
   - PDF: `pdf-parse` library for accurate text extraction
   - Text: Direct UTF-8 encoding

@@ -215,8 +215,17 @@ Analysis:`;
     }
 
     const response = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'mixtral-8x7b-32768',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful medical AI assistant. Provide accurate, evidence-based medical information.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      model: 'allam-2-7b',
       temperature: 0.7,
       max_tokens: 2000,
     });
