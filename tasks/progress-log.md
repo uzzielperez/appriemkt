@@ -21,6 +21,14 @@
     - Replaced the industrial "Roboto Slab" with **Lora** (a sophisticated serif) for body text to improve trustworthiness and elegance.
     - Replaced UI fonts with **Inter** (modern high-end sans-serif) for improved readability and a premium tech feel.
 
+### [2026-01-03] - Planning: UX Refinement and Trust Signals
+- **New Requirements Added:**
+    - Hero section update to "Your AI-Powered Healthcare Companion".
+    - Visual hierarchy improvements (more icons/screenshots).
+    - CTA clarification (Primary vs. Secondary).
+    - Core Pillar use cases and partner logo context.
+    - Contact form validation and legal pages (Privacy/Terms).
+
 ### Technical Notes
 - Multi-page structure significantly improves First Contentful Paint (FCP) and SEO by reducing JavaScript bundle overhead.
 - Netlify redirects updated to support direct access to `.html` routes.

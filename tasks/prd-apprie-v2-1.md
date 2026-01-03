@@ -11,11 +11,13 @@ Apprie is optimizing its existing high-quality design for speed and responsivene
     *   **Health Coaching:** Establish a $29.99/year subscription model.
     *   **Research Platforms:** Build landing pages/sections for Drug Discovery and Digital Twin platforms.
 4.  **B2B & Support:** Define clear tiers for individual support and corporate white-labeling.
+5.  **Design & Content Polish:** Refine the landing page messaging, visual hierarchy, and credibility indicators (social proof).
 
 ## Functional Requirements
 1.  **Navigation & Routing:**
     *   Update Navbar to: `Products`, `Support`, `Contact`.
     *   Create a separate `About` page (containing the Team section).
+    *   **New:** Add feature highlights/previews on the homepage for each product.
 2.  **Product Suite:**
     *   **Medical Copilot (RAG):**
         *   Login flow for Patients and Admins.
@@ -28,6 +30,15 @@ Apprie is optimizing its existing high-quality design for speed and responsivene
 3.  **Support & White-labeling:**
     *   **Individual Tiers:** Basic (Community), Pro (Priority Support), Premium (Consultations).
     *   **White-labeling:** Suggestion: API Access, Custom Brand Assets, Dedicated Cloud Instance, and HIPAA Compliance as a Service.
+4.  **User Experience & Content (New):**
+    *   **Hero Section:** Update to "Your AI-Powered Healthcare Companion" with a clear value proposition.
+    *   **Visual Hierarchy:** Use more icons, screenshots, and illustrations to reduce text-heavy areas.
+    *   **CTA Strategy:** Define Primary vs. Secondary CTAs with clear outcome descriptions.
+    *   **Core Pillars:** Detail specific medical use cases under each pillar.
+    *   **Social Proof:** Add context for partner logos and sections for testimonials/case studies.
+5.  **Technical & Legal (New):**
+    *   **Contact Form:** Add real-time validation, success/error feedback, and response time notice.
+    *   **Legal:** Functional (non-placeholder) Privacy Policy and Terms of Use pages.
 
 ## Technical Considerations
 *   **Speed:** Image optimization, CSS minification, and removing unused legacy scripts.

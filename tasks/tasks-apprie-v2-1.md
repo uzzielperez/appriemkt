@@ -35,4 +35,15 @@ Check off tasks as they are completed using `[x]`.
   - [ ] 3.1 Build Support page with tiered pricing (Individual vs Enterprise)
   - [ ] 3.2 Implement White-labeling options (API, Custom Instance, Compliance)
   - [ ] 3.3 Add "Request Demo" CTA for corporate partnerships
+- [ ] 4.0 Design & User Experience Refinement
+  - [ ] 4.1 Update Hero Section: "Your AI-Powered Healthcare Companion" + specific value prop
+  - [ ] 4.2 Improve Visual Hierarchy: Add specific icons for pillars and product action screenshots
+  - [ ] 4.3 Refine CTAs: Clearly distinguish Primary (Explore) vs Secondary (Copilot) with descriptions
+- [ ] 5.0 Content Clarity & Social Proof
+  - [ ] 5.1 Expand Core Pillars: Add tangible use cases (e.g. diagnostic scenarios)
+  - [ ] 5.2 Contextualize Proof Points: Add context for partner logos and sections for testimonials
+  - [ ] 5.3 Implement Product Previews: Highlights on homepage before product deep-links
+- [ ] 6.0 Technical & Legal Essentials
+  - [ ] 6.1 Upgrade Contact Form: Validation feedback, success/error states, and response time note
+  - [ ] 6.2 Legal Compliance: Replace placeholder links for Privacy Policy & Terms of Use
 
