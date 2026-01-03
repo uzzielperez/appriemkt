@@ -11351,3 +11351,90 @@ section#contact form#contactForm :-ms-input-placeholder {
   filter: grayscale(0%) brightness(1);
   opacity: 1;
 }
+
+/* Logo Marquee Styles */
+.logo-marquee-container {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  background: #0a0a0a;
+  margin: 2rem 0;
+}
+
+.logo-marquee-wrapper {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  align-items: center;
+}
+
+.logo-marquee-track {
+  display: flex;
+  animation: logo-scroll 40s linear infinite;
+  gap: 80px;
+  padding: 0 40px;
+}
+
+.logo-item {
+  width: 200px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-item img {
+  max-height: 50px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* Sync the two tracks */
+.logo-marquee-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.marquee-grayscale {
+  filter: grayscale(100%) brightness(0.8);
+  opacity: 0.4;
+}
+
+.marquee-color {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Spotlight mask */
+  mask-image: linear-gradient(to right, 
+    transparent 0%, 
+    transparent 35%, 
+    black 45%, 
+    black 55%, 
+    transparent 65%, 
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(to right, 
+    transparent 0%, 
+    transparent 35%, 
+    black 45%, 
+    black 55%, 
+    transparent 65%, 
+    transparent 100%
+  );
+}
+
+@keyframes logo-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Pause on hover if desired, but here we want continuous motion for the effect */
+.logo-marquee-container:hover .logo-marquee-track {
+  animation-play-state: paused;
+}
