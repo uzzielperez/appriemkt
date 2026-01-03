@@ -17,10 +17,7 @@
   status = 200
   force = true
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Remove the /* to index.html catch-all to allow separate HTML pages to load
 
 [[plugins]]
 package = "@netlify/plugin-functions-install-core" 
