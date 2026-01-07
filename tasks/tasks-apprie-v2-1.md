@@ -29,6 +29,9 @@ Check off tasks as they are completed using `[x]`.
     - [ ] 2.1.1 Add Patient/Admin Login UI
     - [ ] 2.1.2 Implement RAG document summarization frontend (linking to Netlify functions)
   - [ ] 2.2 Health Coaching: Implement $29.99/year paywall UI and feature list
+    - [ ] 2.2.1 Design Longevity Dashboard: Mockup for HRV, VO2Max, and Sleep markers (Apple Health integration strategy)
+    - [ ] 2.2.2 Build Onboarding Chatbot: Intake flow for health goals and baseline information
+    - [ ] 2.2.3 Data Integration Strategy: Research Apple HealthKit (iOS) and Health Connect (Android) API implementation
   - [ ] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization (static/mock)
   - [ ] 2.4 Research - Digital Twin: Create Health Dashboard UI for longevity research
 - [ ] 3.0 Support & Monetization
@@ -46,4 +49,10 @@ Check off tasks as they are completed using `[x]`.
 - [ ] 6.0 Technical & Legal Essentials
   - [ ] 6.1 Upgrade Contact Form: Validation feedback, success/error states, and response time note
   - [ ] 6.2 Legal Compliance: Replace placeholder links for Privacy Policy & Terms of Use
+- [ ] 7.0 Compliance & Medical AI Infrastructure
+  - [ ] 7.1 Security Certification Prep: Document SOC 2 Type II audit requirements and existing controls
+  - [ ] 7.2 Privacy Compliance: Implement GDPR/CCPA automated compliance controls and data mapping
+  - [ ] 7.3 Data Privacy: Set up enterprise encryption standards and strict access control logging
+  - [ ] 7.4 Secure AI Policy: Define and display data usage guarantees (no model training on user data)
+  - [x] 7.5 Medical AI Research: Evaluate medical-grade LLMs (BioGPT, ClinicalBERT) and embedding models
 
