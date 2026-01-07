@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Intelligence - Apprie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --primary-teal: #008080;
+            --accent-cyan: #00ffff;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --muscle-fresh: #00e676;
+            --muscle-fatigued: #ff9100;
+            --muscle-sore: #ff4d4d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .section-nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-pill {
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: #111;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid #222;
+            transition: all 0.3s;
+        }
+
+        .nav-pill.active {
+            background: var(--primary-teal);
+            color: white;
+            border-color: var(--primary-teal);
+        }
+
+        .nav-pill:hover:not(.active) {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .body-intelligence-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+        }
+
+        .body-map-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #222;
+            text-align: center;
+        }
+
+        .muscle-map-svg {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .muscle-group {
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .muscle-group:hover {
+            opacity: 0.8;
+        }
+
+        .side-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stat-subcard {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #222;
+        }
+
+        .stat-title {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-main-val {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #222;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-cyan);
+        }
+
+        .muscle-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .nav-back:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Muscle Colors */
+        .fresh { fill: var(--muscle-fresh); }
+        .fatigued { fill: var(--muscle-fatigued); }
+        .sore { fill: var(--muscle-sore); }
+        .neutral { fill: #333; }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Coach</a>
+        
+        <div class="header">
+            <div>
+                <h1>Body Intelligence <span class="badge-pro" style="background: linear-gradient(45deg, var(--primary-teal), var(--accent-cyan)); color: black; padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; margin-left: 10px;">PRO</span></h1>
+                <p style="color: var(--text-gray); margin-top: 5px;">Muscle Readiness & Physical Composition</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">Research Prototype</div>
+                </div>
+                <img src="../assets/img/team/Uzzie.jpg" alt="User" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-cyan);">
+            </div>
+        </div>
+
+        <div class="section-nav">
+            <a href="dashboard.html" class="nav-pill">Longevity Markers</a>
+            <a href="body-intelligence.html" class="nav-pill active">Body Intelligence & Map</a>
+        </div>
+
+        <div class="body-intelligence-grid">
+            <div class="body-map-card">
+                <h3 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase;">Muscle Readiness Map</h3>
+                
+                <!-- Simple SVG Body Map Placeholder -->
+                <svg class="muscle-map-svg" viewBox="0 0 200 400">
+                    <!-- Head -->
+                    <circle cx="100" cy="30" r="20" class="neutral" />
+                    <!-- Neck -->
+                    <rect x="95" y="50" width="10" height="10" class="neutral" />
+                    <!-- Torso -->
+                    <path d="M70 60 L130 60 L140 180 L60 180 Z" class="fresh" />
+                    <!-- Shoulders -->
+                    <circle cx="65" cy="75" r="12" class="fatigued" />
+                    <circle cx="135" cy="75" r="12" class="fatigued" />
+                    <!-- Upper Arms -->
+                    <rect x="45" y="90" width="18" height="60" rx="9" class="neutral" />
+                    <rect x="137" y="90" width="18" height="60" rx="9" class="neutral" />
+                    <!-- Lower Arms -->
+                    <rect x="40" y="155" width="15" height="50" rx="7" class="neutral" />
+                    <rect x="145" y="155" width="15" height="50" rx="7" class="neutral" />
+                    <!-- Thighs -->
+                    <rect x="65" y="185" width="30" height="90" rx="15" class="sore" />
+                    <rect x="105" y="185" width="30" height="90" rx="15" class="sore" />
+                    <!-- Lower Legs -->
+                    <rect x="68" y="280" width="24" height="80" rx="12" class="fresh" />
+                    <rect x="108" y="280" width="24" height="80" rx="12" class="fresh" />
+                </svg>
+
+                <div class="muscle-legend">
+                    <div class="legend-item"><div class="color-dot fresh"></div> Fresh</div>
+                    <div class="legend-item"><div class="color-dot fatigued"></div> Fatigued</div>
+                    <div class="legend-item"><div class="color-dot sore"></div> Sore</div>
+                </div>
+                
+                <p style="color: var(--text-gray); font-size: 0.8rem; margin-top: 20px;">
+                    Click a muscle group for recovery insights and localized training advice.
+                </p>
+            </div>
+
+            <div class="side-stats">
+                <!-- Weight & Composition -->
+                <div class="stat-subcard">
+                    <span class="stat-title">Weight & Body Fat</span>
+                    <div class="stat-flex">
+                        <div class="stat-main-val">76.4 <span style="font-size: 0.9rem; color: var(--text-gray);">kg</span></div>
+                        <div style="color: var(--success-green); font-size: 0.8rem;">-0.5kg this week</div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div class="stat-flex" style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 5px;">
+                            <span>Body Fat: 14.2%</span>
+                            <span>Target: 12%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" style="width: 70%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stability & Mobility -->
+                <div class="stat-subcard">
+                    <span class="stat-title">Stability & Balance Score</span>
+                    <div class="stat-flex">
+                        <div class="stat-main-val">88 <span style="font-size: 0.9rem; color: var(--text-gray);">/ 100</span></div>
+                        <i class="fas fa-balance-scale" style="color: var(--accent-cyan); font-size: 1.5rem;"></i>
+                    </div>
+                    <p style="color: var(--text-gray); font-size: 0.75rem; margin-top: 10px;">
+                        Balance test (Standing One Leg): 52 seconds avg. Mobility in hips is improving (+5° range).
+                    </p>
+                </div>
+
+                <!-- Diet baseline -->
+                <div class="stat-subcard">
+                    <span class="stat-title">Nutritional Baseline (Today)</span>
+                    <div class="stat-flex">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.2rem; font-weight: 700;">1,840</div>
+                            <div style="font-size: 0.6rem; color: var(--text-gray);">KCAL</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.2rem; font-weight: 700;">145g</div>
+                            <div style="font-size: 0.6rem; color: var(--text-gray);">PROTEIN</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.2rem; font-weight: 700;">62g</div>
+                            <div style="font-size: 0.6rem; color: var(--text-gray);">FATS</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container" style="height: 4px; display: flex; background: #222;">
+                        <div style="width: 40%; background: #00ffff; height: 100%;"></div>
+                        <div style="width: 30%; background: #008080; height: 100%;"></div>
+                        <div style="width: 30%; background: #004d4d; height: 100%;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-gray); margin-top: 5px;">
+                        <span>P: 40%</span>
+                        <span>C: 30%</span>
+                        <span>F: 30%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-gray); font-size: 0.8rem; margin-top: 50px;">
+            <p><i class="fas fa-info-circle me-2"></i> Muscle freshness is calculated based on training volume, intensity, and perceived soreness. Connect with Fitbod or Strava for real-time updates.</p>
+        </div>
+    </div>
+
+</body>
+</html>

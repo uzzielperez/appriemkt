@@ -32,6 +32,12 @@ Check off tasks as they are completed using `[x]`.
     - [x] 2.2.1 Design Longevity Dashboard: Mockup for HRV, VO2Max, and Sleep markers (Apple Health integration strategy)
     - [x] 2.2.2 Build Onboarding Chatbot: Intake flow for health goals and baseline information
     - [x] 2.2.3 Data Integration Strategy: Research Apple HealthKit (iOS) and Health Connect (Android) API implementation
+    - [x] 2.2.4 Interactive Tooltips: Add hover info for HRV, VO2Max, and Sleep with links to coaches
+    - [x] 2.2.5 Specialized Coaches: Create landing pages/chat interfaces for VO2Max, HRV, and Sleep agents
+    - [x] 2.2.6 Body Intelligence Dashboard:
+        - [x] 2.2.6.1 Implement Interactive Body Map: Visual muscle freshness tracking (Fitbod-style)
+        - [x] 2.2.6.2 Stability & Weight Tracking: Visual charts for balance and composition
+        - [x] 2.2.6.3 Diet Integration: Baseline display for nutritional intake
   - [ ] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization (static/mock)
   - [ ] 2.4 Research - Digital Twin: Create Health Dashboard UI for longevity research
 - [ ] 3.0 Support & Monetization

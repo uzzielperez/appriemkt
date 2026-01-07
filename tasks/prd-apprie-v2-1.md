@@ -24,6 +24,12 @@ Apprie is optimizing its existing high-quality design for speed and responsivene
         *   RAG system integration for document summarization.
     *   **Health Coaching ($29.99/year):**
         *   **Longevity Dashboard:** Integration with Apple Health/Fitness data (HRV, VO2Max, Sleep, Activity).
+        *   **Interactive Tooltips:** Hover states for HRV, VO2Max, and Sleep providing quick definitions and direct links to specialized coaches.
+        *   **Specialized AI Coaches:** Dedicated agents for increasing VO2 Max, improving HRV, and optimizing Sleep.
+        *   **Body Intelligence Dashboard:** A separate view or section for tracking:
+            *   **Muscles (Body Map):** A visual representation of muscle groups showing "freshness" for training (similar to Fitbod).
+            *   **Stability & Weight:** Tracking balance markers and body composition.
+            *   **Diet:** Integrated nutritional tracking baseline.
         *   **Onboarding Flow:** Interactive chat-based intake to identify health goals and establish a baseline.
         *   **Feature list:** Activity tracking, recovery scores, nutritional coaching.
         *   **Payment/Subscription CTA.**

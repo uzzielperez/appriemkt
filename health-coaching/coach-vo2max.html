@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VO2 Max Performance Coach - Apprie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --primary-teal: #008080;
+            --accent-cyan: #00ffff;
+            --card-bg: #111111;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .coach-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff4d4d, #ff9100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: #1a1a1a;
+            color: var(--text-white);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #ff4d4d;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input-area {
+            padding: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 50px;
+            padding: 15px 25px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #ff4d4d;
+        }
+
+        .send-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .chip {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chip:hover {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <a href="dashboard.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        
+        <div class="chat-header">
+            <div class="coach-avatar">
+                <i class="fas fa-running"></i>
+            </div>
+            <div>
+                <h2 style="margin: 0; font-size: 1.1rem;">VO2 Max Performance Agent</h2>
+                <p style="margin: 0; font-size: 0.8rem; color: #ff4d4d;">Cardiovascular Endurance Specialist</p>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">
+                Hi! I'm your VO2 Max specialist. Your current estimated VO2 Max is <strong>42.5 ml/kg/min</strong>. 
+                <br><br>
+                This puts you in the "Good" category for your age group, but we can definitely push that into "Excellent" with targeted <strong>Zone 2 training</strong> and <strong>Norwegian 4x4 intervals</strong>.
+                <br><br>
+                Ready to build a 4-week progression plan to hit 45 ml/kg/min?
+            </div>
+            
+            <div class="suggestion-chips">
+                <div class="chip">What is Zone 2 training?</div>
+                <div class="chip">Norwegian 4x4 Plan</div>
+                <div class="chip">How to test my VO2 Max?</div>
+                <div class="chip">Nutrition for cardio</div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" placeholder="Ask about VO2 Max training...">
+            <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+</body>
+</html>
