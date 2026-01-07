@@ -164,6 +164,8 @@
         /* Tooltip Styles */
         .stat-card {
             position: relative;
+            cursor: pointer;
+            user-select: none; /* Prevent text selection on double click */
         }
 
         .tooltip-info {
@@ -278,7 +280,7 @@
 
         <div class="grid-container">
             <!-- HRV -->
-            <div class="stat-card">
+            <div class="stat-card" ondblclick="window.location.href='coach-hrv.html'">
                 <div class="stat-header">
                     <span class="stat-label">HRV (Avg)</span>
                     <i class="fas fa-heartbeat stat-icon"></i>
@@ -290,12 +292,12 @@
                 <div class="tooltip-info">
                     <strong>Heart Rate Variability</strong><br>
                     A key indicator of your autonomic nervous system's balance and recovery state.<br>
-                    <a href="coach-hrv.html" class="coach-link">Consult HRV Coach <i class="fas fa-chevron-right ms-1"></i></a>
+                    <span class="coach-link">Double-click to consult HRV Coach <i class="fas fa-chevron-right ms-1"></i></span>
                 </div>
             </div>
 
             <!-- VO2 MAX -->
-            <div class="stat-card">
+            <div class="stat-card" ondblclick="window.location.href='coach-vo2max.html'">
                 <div class="stat-header">
                     <span class="stat-label">VO2 Max</span>
                     <i class="fas fa-running stat-icon"></i>
@@ -307,12 +309,12 @@
                 <div class="tooltip-info">
                     <strong>VO2 Max</strong><br>
                     The maximum amount of oxygen your body can utilize during exercise. A primary marker for longevity.<br>
-                    <a href="coach-vo2max.html" class="coach-link">Consult VO2 Max Coach <i class="fas fa-chevron-right ms-1"></i></a>
+                    <span class="coach-link">Double-click to consult VO2 Max Coach <i class="fas fa-chevron-right ms-1"></i></span>
                 </div>
             </div>
 
             <!-- SLEEP -->
-            <div class="stat-card">
+            <div class="stat-card" ondblclick="window.location.href='coach-sleep.html'">
                 <div class="stat-header">
                     <span class="stat-label">Sleep Score</span>
                     <i class="fas fa-moon stat-icon"></i>
@@ -324,7 +326,7 @@
                 <div class="tooltip-info">
                     <strong>Sleep Quality</strong><br>
                     Based on depth, duration, and consistency. Critical for cognitive function and hormonal balance.<br>
-                    <a href="coach-sleep.html" class="coach-link">Consult Sleep Coach <i class="fas fa-chevron-right ms-1"></i></a>
+                    <span class="coach-link">Double-click to consult Sleep Coach <i class="fas fa-chevron-right ms-1"></i></span>
                 </div>
             </div>
         </div>
