@@ -28,10 +28,10 @@ Check off tasks as they are completed using `[x]`.
   - [ ] 2.1 Enhance Medical Copilot section:
     - [ ] 2.1.1 Add Patient/Admin Login UI
     - [ ] 2.1.2 Implement RAG document summarization frontend (linking to Netlify functions)
-  - [ ] 2.2 Health Coaching: Implement $29.99/year paywall UI and feature list
-    - [ ] 2.2.1 Design Longevity Dashboard: Mockup for HRV, VO2Max, and Sleep markers (Apple Health integration strategy)
-    - [ ] 2.2.2 Build Onboarding Chatbot: Intake flow for health goals and baseline information
-    - [ ] 2.2.3 Data Integration Strategy: Research Apple HealthKit (iOS) and Health Connect (Android) API implementation
+  - [x] 2.2 Health Coaching: Implement $29.99/year paywall UI and feature list
+    - [x] 2.2.1 Design Longevity Dashboard: Mockup for HRV, VO2Max, and Sleep markers (Apple Health integration strategy)
+    - [x] 2.2.2 Build Onboarding Chatbot: Intake flow for health goals and baseline information
+    - [x] 2.2.3 Data Integration Strategy: Research Apple HealthKit (iOS) and Health Connect (Android) API implementation
   - [ ] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization (static/mock)
   - [ ] 2.4 Research - Digital Twin: Create Health Dashboard UI for longevity research
 - [ ] 3.0 Support & Monetization

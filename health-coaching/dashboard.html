@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longevity Dashboard - Apprie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --primary-teal: #008080;
+            --accent-cyan: #00ffff;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --danger-red: #ff4d4d;
+            --success-green: #00e676;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-cyan);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #222;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-teal);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-trend {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up { color: var(--success-green); }
+        .trend-down { color: var(--danger-red); }
+
+        .chart-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #222;
+            margin-bottom: 40px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        .badge-pro {
+            background: linear-gradient(45deg, var(--primary-teal), var(--accent-cyan));
+            color: black;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-left: 10px;
+        }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .nav-back:hover {
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Coach</a>
+        
+        <div class="header">
+            <div>
+                <h1>Longevity Dashboard <span class="badge-pro">PRO</span></h1>
+                <p style="color: var(--text-gray); margin-top: 5px;">Biometric Baseline & Health Forecast</p>
+            </div>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">Research Prototype</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">ID: APP-9921</div>
+                </div>
+                <img src="../assets/img/team/Uzzie.jpg" alt="User">
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <!-- HRV -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">HRV (Avg)</span>
+                    <i class="fas fa-heartbeat stat-icon"></i>
+                </div>
+                <div class="stat-value">68 <span style="font-size: 1rem; font-weight: 400;">ms</span></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-caret-up"></i> 12% vs last month
+                </div>
+            </div>
+
+            <!-- VO2 MAX -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">VO2 Max</span>
+                    <i class="fas fa-running stat-icon"></i>
+                </div>
+                <div class="stat-value">42.5 <span style="font-size: 1rem; font-weight: 400;">ml/kg/min</span></div>
+                <div class="stat-trend" style="color: var(--text-gray);">
+                    <i class="fas fa-minus"></i> Stable
+                </div>
+            </div>
+
+            <!-- SLEEP -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Sleep Score</span>
+                    <i class="fas fa-moon stat-icon"></i>
+                </div>
+                <div class="stat-value">84 <span style="font-size: 1rem; font-weight: 400;">/ 100</span></div>
+                <div class="stat-trend trend-down">
+                    <i class="fas fa-caret-down"></i> 4% vs last week
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3 style="margin: 0; font-size: 1.1rem; text-transform: uppercase;">Recovery Analysis (7 Days)</h3>
+                <div style="font-size: 0.8rem; color: var(--text-gray);">Source: Apple HealthKit Mock</div>
+            </div>
+            <canvas id="recoveryChart"></canvas>
+        </div>
+
+        <div style="text-align: center; color: var(--text-gray); font-size: 0.8rem; margin-top: 50px;">
+            <p><i class="fas fa-info-circle me-2"></i> This dashboard is a prototype demonstrating potential wearable integration.</p>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('recoveryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Recovery Score',
+                    data: [65, 78, 82, 45, 70, 91, 88],
+                    borderColor: '#00ffff',
+                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#00ffff'
+                }, {
+                    label: 'Activity Load',
+                    data: [80, 60, 55, 90, 75, 40, 50],
+                    borderColor: '#008080',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: { color: '#a0a0a0', font: { family: 'Montserrat' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#222' },
+                        ticks: { color: '#a0a0a0' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#a0a0a0' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

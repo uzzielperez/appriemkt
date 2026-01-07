@@ -180,6 +180,10 @@
 
         let step = 0;
 
+        paywallBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+
         function addMessage(text, sender) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}`;
