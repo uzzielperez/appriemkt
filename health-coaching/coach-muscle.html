@@ -14,6 +14,7 @@
             --card-bg: #111111;
             --text-white: #ffffff;
             --text-gray: #a0a0a0;
+            --muscle-blue: #00ffff;
         }
 
         body {
@@ -67,11 +68,12 @@
         }
 
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 15px 20px;
             border-radius: 20px;
             font-size: 0.95rem;
             line-height: 1.5;
+            position: relative;
         }
 
         .message.bot {
@@ -79,6 +81,7 @@
             background: #1a1a1a;
             color: var(--text-white);
             border-bottom-left-radius: 2px;
+            border: 1px solid #333;
         }
 
         .message.user {
@@ -87,6 +90,32 @@
             color: white;
             border-bottom-right-radius: 2px;
         }
+
+        .workout-card {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .ppl-split {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .split-day {
+            flex: 1;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        .split-day h5 { margin: 0 0 5px 0; font-size: 0.75rem; color: var(--accent-cyan); text-transform: uppercase; }
+        .split-day p { margin: 0; font-size: 0.7rem; color: var(--text-gray); }
 
         .chat-input-area {
             padding: 20px 0;
@@ -125,20 +154,6 @@
             transition: transform 0.2s;
         }
 
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .nav-back {
-            text-decoration: none;
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
         .suggestion-chips {
             display: flex;
             gap: 10px;
@@ -161,6 +176,20 @@
             border-color: var(--accent-cyan);
             color: var(--accent-cyan);
         }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -180,24 +209,119 @@
 
         <div class="chat-messages" id="chat-messages">
             <div class="message bot">
-                Hi! I'm your Muscle & Composition Specialist. Your current <strong>Muscle-to-Mass Ratio is 38.2%</strong>, which is excellent for your age group and indicates strong metabolic reserve.
+                Hi! I'm your Muscle & Composition Specialist. We're looking at your <strong>38.2% Muscle-to-Mass Ratio</strong>. 
                 <br><br>
-                Maintaining this skeletal muscle mass is one of the most effective ways to ensure long-term health and prevent age-related decline. Should we look at <strong>protein optimization</strong> for your current training load, or discuss <strong>resistance strategies</strong> to improve your stability and power?
+                To refine your metabolic health and physique, what is your primary goal for the next 6 months?
             </div>
             
-            <div class="suggestion-chips">
-                <div class="chip">Protein intake goals</div>
-                <div class="chip">Hypertrophy vs Strength</div>
-                <div class="chip">Preventing muscle loss</div>
-                <div class="chip">Analyze body fat ratio</div>
+            <div class="suggestion-chips" id="goal-chips">
+                <div class="chip" onclick="selectGoal('Bigger')">Get Bigger (Hypertrophy/Bulk)</div>
+                <div class="chip" onclick="selectGoal('Smaller')">Get Smaller (Fat Loss/Lean)</div>
+                <div class="chip" onclick="selectGoal('Athletic')">Athletic Build (Functional/Agility)</div>
             </div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" class="chat-input" placeholder="Ask about muscle & weight ratio...">
-            <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Select a goal or type here...">
+            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        function appendMessage(role, content) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            msgDiv.innerHTML = content;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function selectGoal(goal) {
+            document.getElementById('goal-chips').style.display = 'none';
+            appendMessage('user', `I want to get ${goal}.`);
+            
+            setTimeout(() => {
+                let strategy = "";
+                let splitHtml = "";
+                
+                if (goal === 'Bigger') {
+                    strategy = "To maximize hypertrophy, we'll focus on <strong>Progressive Overload</strong> and a slight caloric surplus. We'll use a 6-day PPL split for maximum volume.";
+                    splitHtml = `
+                        <div class="ppl-split">
+                            <div class="split-day"><h5>Push</h5><p>Chest/Tri</p></div>
+                            <div class="split-day"><h5>Pull</h5><p>Back/Bi</p></div>
+                            <div class="split-day"><h5>Legs</h5><p>Quads/Hams</p></div>
+                        </div>
+                    `;
+                } else if (goal === 'Smaller') {
+                    strategy = "To get lean while preserving muscle, we'll focus on <strong>High-Intensity Resistance Training (HIRT)</strong> and a metabolic deficit. We'll use a 4-day PPL+Cardio split.";
+                    splitHtml = `
+                        <div class="ppl-split">
+                            <div class="split-day"><h5>P+P</h5><p>Upper body</p></div>
+                            <div class="split-day"><h5>Legs</h5><p>Lower body</p></div>
+                            <div class="split-day"><h5>HIIT</h5><p>Metabolic</p></div>
+                        </div>
+                    `;
+                } else {
+                    strategy = "For an athletic build, we'll focus on <strong>Power and Explosiveness</strong>. We'll combine compound lifts with functional movements and agility work.";
+                    splitHtml = `
+                        <div class="ppl-split">
+                            <div class="split-day"><h5>Power</h5><p>Explosive</p></div>
+                            <div class="split-day"><h5>Pull</h5><p>Stability</p></div>
+                            <div class="split-day"><h5>Push</h5><p>Control</p></div>
+                        </div>
+                    `;
+                }
+
+                let responseHtml = `${strategy}
+                
+                <div class="workout-card">
+                    <h4 style="margin:0 0 10px 0; color: var(--accent-cyan);">Baseline Routine: Week 1</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-gray);">Essential compound movements for your ${goal} goal:</p>
+                    
+                    <ul style="padding-left: 15px; font-size: 0.85rem;">
+                        <li><strong>Push:</strong> Bench Press / Overhead Press</li>
+                        <li><strong>Pull:</strong> Deadlift / Weighted Pull-ups</li>
+                        <li><strong>Legs:</strong> Back Squat / Bulgarian Split Squat</li>
+                    </ul>
+
+                    ${splitHtml}
+                </div>
+                
+                Should we customize your <strong>protein targets</strong> for this plan, or would you like a <strong>form breakdown</strong> for these exercises?`;
+                
+                appendMessage('bot', responseHtml);
+                
+                const nextChips = document.createElement('div');
+                nextChips.className = 'suggestion-chips';
+                nextChips.innerHTML = `
+                    <div class="chip">Calculate Protein Target</div>
+                    <div class="chip">Show Form Videos</div>
+                    <div class="chip">Adjust for home gym</div>
+                `;
+                chatMessages.appendChild(nextChips);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text) {
+                appendMessage('user', text);
+                chatInput.value = '';
+                setTimeout(() => {
+                    appendMessage('bot', "Understood. Maintaining intensity is key for your muscle-to-mass ratio. I've updated your daily dashboard to track these specific baseline metrics.");
+                }, 1000);
+            }
+        }
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
 
 </body>
 </html>
