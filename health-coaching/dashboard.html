@@ -63,8 +63,8 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             margin-bottom: 40px;
         }
 
@@ -327,6 +327,23 @@
                     <strong>Sleep Quality</strong><br>
                     Based on depth, duration, and consistency. Critical for cognitive function and hormonal balance.<br>
                     <span class="coach-link">Double-click to consult Sleep Coach <i class="fas fa-chevron-right ms-1"></i></span>
+                </div>
+            </div>
+
+            <!-- MUSCLE/MASS RATIO -->
+            <div class="stat-card" ondblclick="window.location.href='coach-muscle.html'">
+                <div class="stat-header">
+                    <span class="stat-label">Muscle/Mass Ratio</span>
+                    <i class="fas fa-dumbbell stat-icon"></i>
+                </div>
+                <div class="stat-value">38.2 <span style="font-size: 1rem; font-weight: 400;">%</span></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-caret-up"></i> 0.5% vs last scan
+                </div>
+                <div class="tooltip-info">
+                    <strong>Skeletal Muscle Mass %</strong><br>
+                    A critical marker for metabolic health and physical longevity. Prevents sarcopenia and metabolic decline.<br>
+                    <span class="coach-link">Double-click to consult Muscle Coach <i class="fas fa-chevron-right ms-1"></i></span>
                 </div>
             </div>
         </div>
