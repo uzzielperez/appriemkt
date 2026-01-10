@@ -46,6 +46,10 @@ Check off tasks as they are completed using `[x]`.
   - [ ] 3.1 Build Support page with tiered pricing (Individual vs Enterprise)
   - [ ] 3.2 Implement White-labeling options (API, Custom Instance, Compliance)
   - [ ] 3.3 Add "Request Demo" CTA for corporate partnerships
+  - [ ] 3.4 Standalone Distribution (New):
+    - [ ] 3.4.1 Proof of Concept: Evaluate Tauri vs Electron for packaging .dmg/.exe
+    - [ ] 3.4.2 Modularization: Prepare codebase for feature-specific builds (Copilot vs Coach)
+    - [ ] 3.4.3 Licensing: Integrate a license key validation system (e.g. Keygen.sh or Stripe)
 - [ ] 4.0 Design & User Experience Refinement
   - [ ] 4.1 Update Hero Section: "Your AI-Powered Healthcare Companion" + specific value prop
   - [ ] 4.2 Improve Visual Hierarchy: Add specific icons for pillars and product action screenshots
