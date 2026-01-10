@@ -70,7 +70,7 @@
 - **Double-Click Navigation**: Implemented `ondblclick` triggers on dashboard cards for instant navigation to specialized AI agents.
 - **Specialized AI Agents**: Created dedicated chat interfaces for **HRV**, **VO2 Max**, **Sleep**, and **Muscle/Composition** optimization.
     - **VO2 Max Coach**: Implemented interactive level selection (Beginner to Elite) and a 6-month Polarized Training plan (Zone 2, 4x4 Intervals, Sprints) with a visual progress tracker.
-    - **Muscle Coach**: Implemented interactive goal selection (Bigger, Smaller, Athletic) with Push/Pull/Legs (PPL) split suggestions and baseline compound exercise recommendations.
+    - **Muscle Coach**: Implemented interactive goal selection (Bigger, Smaller, Athletic, Busy Schedule) with Push/Pull/Legs (PPL) or Full Body split suggestions and baseline compound exercise recommendations.
 - **Body Intelligence Dashboard**: Built a new section (`body-intelligence.html`) featuring:
     - **Anatomical Muscle Map**: A detailed SVG visualization (Fitbod-style) showing muscle freshness (Front view: Pectorals, Delts, Abs, Quads, Calves).
     - **Weight & Composition Tracking**: Dashboard for BMI, Body Fat %, and Basal Metabolic Rate.

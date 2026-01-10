@@ -211,13 +211,14 @@
             <div class="message bot">
                 Hi! I'm your Muscle & Composition Specialist. We're looking at your <strong>38.2% Muscle-to-Mass Ratio</strong>. 
                 <br><br>
-                To refine your metabolic health and physique, what is your primary goal for the next 6 months?
+                To refine your metabolic health and physique, what is your primary goal and schedule for the next 6 months?
             </div>
             
             <div class="suggestion-chips" id="goal-chips">
-                <div class="chip" onclick="selectGoal('Bigger')">Get Bigger (Hypertrophy/Bulk)</div>
-                <div class="chip" onclick="selectGoal('Smaller')">Get Smaller (Fat Loss/Lean)</div>
-                <div class="chip" onclick="selectGoal('Athletic')">Athletic Build (Functional/Agility)</div>
+                <div class="chip" onclick="selectGoal('Bigger')">Get Bigger (Hypertrophy)</div>
+                <div class="chip" onclick="selectGoal('Smaller')">Get Smaller (Fat Loss)</div>
+                <div class="chip" onclick="selectGoal('Athletic')">Athletic Build</div>
+                <div class="chip" onclick="selectGoal('Busy')">Busy Schedule (2-3x / week)</div>
             </div>
         </div>
 
@@ -241,14 +242,22 @@
 
         function selectGoal(goal) {
             document.getElementById('goal-chips').style.display = 'none';
-            appendMessage('user', `I want to get ${goal}.`);
+            let userMsg = "";
+            if (goal === 'Busy') {
+                userMsg = "I have a busy schedule (2-3 times a week).";
+            } else {
+                userMsg = `I want to get ${goal}.`;
+            }
+            appendMessage('user', userMsg);
             
             setTimeout(() => {
                 let strategy = "";
                 let splitHtml = "";
+                let exercises = "";
                 
                 if (goal === 'Bigger') {
                     strategy = "To maximize hypertrophy, we'll focus on <strong>Progressive Overload</strong> and a slight caloric surplus. We'll use a 6-day PPL split for maximum volume.";
+                    exercises = "<li><strong>Push:</strong> Bench Press / Overhead Press</li><li><strong>Pull:</strong> Deadlift / Weighted Pull-ups</li><li><strong>Legs:</strong> Back Squat / Bulgarian Split Squat</li>";
                     splitHtml = `
                         <div class="ppl-split">
                             <div class="split-day"><h5>Push</h5><p>Chest/Tri</p></div>
@@ -258,6 +267,7 @@
                     `;
                 } else if (goal === 'Smaller') {
                     strategy = "To get lean while preserving muscle, we'll focus on <strong>High-Intensity Resistance Training (HIRT)</strong> and a metabolic deficit. We'll use a 4-day PPL+Cardio split.";
+                    exercises = "<li><strong>Push:</strong> Incline Press / Dips</li><li><strong>Pull:</strong> Lat Pulldowns / Face Pulls</li><li><strong>Legs:</strong> Goblet Squats / Lunges</li>";
                     splitHtml = `
                         <div class="ppl-split">
                             <div class="split-day"><h5>P+P</h5><p>Upper body</p></div>
@@ -265,8 +275,9 @@
                             <div class="split-day"><h5>HIIT</h5><p>Metabolic</p></div>
                         </div>
                     `;
-                } else {
+                } else if (goal === 'Athletic') {
                     strategy = "For an athletic build, we'll focus on <strong>Power and Explosiveness</strong>. We'll combine compound lifts with functional movements and agility work.";
+                    exercises = "<li><strong>Power:</strong> Clean & Press / Box Jumps</li><li><strong>Pull:</strong> Rows / Pull-ups</li><li><strong>Push:</strong> Push-ups / Landmine Press</li>";
                     splitHtml = `
                         <div class="ppl-split">
                             <div class="split-day"><h5>Power</h5><p>Explosive</p></div>
@@ -274,24 +285,32 @@
                             <div class="split-day"><h5>Push</h5><p>Control</p></div>
                         </div>
                     `;
+                } else if (goal === 'Busy') {
+                    strategy = "For a busy schedule, we'll use a <strong>High-Efficiency Full Body Split</strong> 2-3 times a week. We focus on 'Bang-for-your-buck' compound movements to maintain and build muscle with minimal time.";
+                    exercises = "<li><strong>Compound 1:</strong> Barbell Back Squats</li><li><strong>Compound 2:</strong> Deadlifts or Romanian Deadlifts</li><li><strong>Upper:</strong> Weighted Dips or Pull-ups</li>";
+                    splitHtml = `
+                        <div class="ppl-split">
+                            <div class="split-day"><h5>Day 1</h5><p>Full Body A</p></div>
+                            <div class="split-day"><h5>Day 2</h5><p>Rest/Cardio</p></div>
+                            <div class="split-day"><h5>Day 3</h5><p>Full Body B</p></div>
+                        </div>
+                    `;
                 }
 
                 let responseHtml = `${strategy}
                 
                 <div class="workout-card">
-                    <h4 style="margin:0 0 10px 0; color: var(--accent-cyan);">Baseline Routine: Week 1</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-gray);">Essential compound movements for your ${goal} goal:</p>
+                    <h4 style="margin:0 0 10px 0; color: var(--accent-cyan);">Efficiency Routine: Week 1</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-gray);">Essential movements for your schedule:</p>
                     
                     <ul style="padding-left: 15px; font-size: 0.85rem;">
-                        <li><strong>Push:</strong> Bench Press / Overhead Press</li>
-                        <li><strong>Pull:</strong> Deadlift / Weighted Pull-ups</li>
-                        <li><strong>Legs:</strong> Back Squat / Bulgarian Split Squat</li>
+                        ${exercises}
                     </ul>
 
                     ${splitHtml}
                 </div>
                 
-                Should we customize your <strong>protein targets</strong> for this plan, or would you like a <strong>form breakdown</strong> for these exercises?`;
+                Should we customize your <strong>protein targets</strong> for this plan, or would you like a <strong>time-saving gym hack</strong> guide?`;
                 
                 appendMessage('bot', responseHtml);
                 
@@ -299,7 +318,7 @@
                 nextChips.className = 'suggestion-chips';
                 nextChips.innerHTML = `
                     <div class="chip">Calculate Protein Target</div>
-                    <div class="chip">Show Form Videos</div>
+                    <div class="chip">Time-saving Gym Hacks</div>
                     <div class="chip">Adjust for home gym</div>
                 `;
                 chatMessages.appendChild(nextChips);
@@ -313,7 +332,7 @@
                 appendMessage('user', text);
                 chatInput.value = '';
                 setTimeout(() => {
-                    appendMessage('bot', "Understood. Maintaining intensity is key for your muscle-to-mass ratio. I've updated your daily dashboard to track these specific baseline metrics.");
+                    appendMessage('bot', "Understood. Efficiency is key when schedule is tight. I've updated your daily dashboard to track these high-impact metrics.");
                 }, 1000);
             }
         }
