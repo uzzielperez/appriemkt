@@ -73,6 +73,8 @@
     - **Muscle Coach**: Implemented interactive goal selection (Bigger, Smaller, Athletic, Busy Schedule) with Push/Pull/Legs (PPL) or Full Body split suggestions and baseline compound exercise recommendations.
 - **Body Intelligence Dashboard**: Built a new section (`body-intelligence.html`) featuring:
     - **Anatomical Muscle Map**: A detailed SVG visualization (Fitbod-style) showing muscle freshness (Front view: Pectorals, Delts, Abs, Quads, Calves).
+    - **Workout Logger (Strava-style)**: Added a "Log New Session" interface to track exercises, weights, reps, and sets.
+    - **Volume Tracking**: Implemented automated volume calculation (Weight x Reps x Sets) and **Volume Trends** visualization with Chart.js to track progressive overload.
     - **Weight & Composition Tracking**: Dashboard for BMI, Body Fat %, and Basal Metabolic Rate.
     - **Stability & Mobility Scores**: Metrics for functional fitness.
 - **4th Longevity Marker**: Added **Muscle/Mass Ratio (SMM %)** to the primary dashboard as a critical longevity predictor.

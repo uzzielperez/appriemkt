@@ -38,6 +38,8 @@ Check off tasks as they are completed using `[x]`.
         - [x] 2.2.6.1 Implement Interactive Body Map: Visual muscle freshness tracking (Fitbod-style)
         - [x] 2.2.6.2 Stability & Weight Tracking: Visual charts for balance and composition
         - [x] 2.2.6.3 Diet Integration: Baseline display for nutritional intake
+        - [x] 2.2.6.4 Workout Logger (Strava-style): UI for logging exercises, weights, reps, and sets
+        - [x] 2.2.6.5 Volume Increase Tracking: Automated calculation and visualization of Progressive Overload volume trends
   - [ ] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization (static/mock)
   - [ ] 2.4 Research - Digital Twin: Create Health Dashboard UI for longevity research
 - [ ] 3.0 Support & Monetization
