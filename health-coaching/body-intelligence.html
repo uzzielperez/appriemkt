@@ -316,6 +316,18 @@
             outline: none;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .custom-input-container {
+            display: none;
+            margin-top: 10px;
+        }
+
         .set-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -526,15 +538,63 @@
             </div>
             
             <form id="workoutForm" onsubmit="event.preventDefault(); saveWorkout();">
-                <div class="form-group">
-                    <label>Exercise Name</label>
-                    <select class="form-input" style="background: #050505;">
-                        <option>Back Squat</option>
-                        <option>Bench Press</option>
-                        <option>Deadlift</option>
-                        <option>Overhead Press</option>
-                        <option>Barbell Row</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Exercise</label>
+                        <select id="exerciseSelect" class="form-input" style="background: #050505;" onchange="handleExerciseChange()">
+                            <optgroup label="Chest">
+                                <option value="Bench Press">Bench Press</option>
+                                <option value="Incline Bench Press">Incline Bench Press</option>
+                                <option value="Chest Flyes">Chest Flyes</option>
+                                <option value="Dips">Dips</option>
+                                <option value="Push-ups">Push-ups</option>
+                            </optgroup>
+                            <optgroup label="Back">
+                                <option value="Deadlift">Deadlift</option>
+                                <option value="Barbell Row">Barbell Row</option>
+                                <option value="Pull-ups">Pull-ups</option>
+                                <option value="Lat Pulldowns">Lat Pulldowns</option>
+                                <option value="Face Pulls">Face Pulls</option>
+                            </optgroup>
+                            <optgroup label="Legs (Quads/Hams/Glutes)">
+                                <option value="Back Squat">Back Squat</option>
+                                <option value="Front Squat">Front Squat</option>
+                                <option value="Leg Press">Leg Press</option>
+                                <option value="Lunges">Lunges</option>
+                                <option value="Romanian Deadlift">Romanian Deadlift</option>
+                                <option value="Hip Thrusts">Hip Thrusts</option>
+                            </optgroup>
+                            <optgroup label="Shoulders">
+                                <option value="Overhead Press">Overhead Press</option>
+                                <option value="Lateral Raises">Lateral Raises</option>
+                                <option value="Arnold Press">Arnold Press</option>
+                            </optgroup>
+                            <optgroup label="Arms & Core">
+                                <option value="Bicep Curls">Bicep Curls</option>
+                                <option value="Tricep Extensions">Tricep Extensions</option>
+                                <option value="Planks">Planks</option>
+                                <option value="Leg Raises">Leg Raises</option>
+                            </optgroup>
+                            <option value="custom">-- Custom Exercise --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Primary Body Part</label>
+                        <select id="bodyPartSelect" class="form-input" style="background: #050505;">
+                            <option value="Chest">Chest</option>
+                            <option value="Back">Back</option>
+                            <option value="Quads">Quads</option>
+                            <option value="Hams/Glutes">Hams/Glutes</option>
+                            <option value="Shoulders">Shoulders</option>
+                            <option value="Arms">Arms</option>
+                            <option value="Core">Core</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="customExerciseContainer" class="form-group custom-input-container">
+                    <label>Custom Exercise Name</label>
+                    <input type="text" id="customExerciseInput" class="form-input" placeholder="Enter exercise name...">
                 </div>
 
                 <div class="form-group">
@@ -573,6 +633,50 @@
     </div>
 
     <script>
+        // Exercise to Body Part Mapping
+        const exerciseMap = {
+            "Bench Press": "Chest",
+            "Incline Bench Press": "Chest",
+            "Chest Flyes": "Chest",
+            "Dips": "Chest",
+            "Push-ups": "Chest",
+            "Deadlift": "Back",
+            "Barbell Row": "Back",
+            "Pull-ups": "Back",
+            "Lat Pulldowns": "Back",
+            "Face Pulls": "Back",
+            "Back Squat": "Quads",
+            "Front Squat": "Quads",
+            "Leg Press": "Quads",
+            "Lunges": "Quads",
+            "Romanian Deadlift": "Hams/Glutes",
+            "Hip Thrusts": "Hams/Glutes",
+            "Overhead Press": "Shoulders",
+            "Lateral Raises": "Shoulders",
+            "Arnold Press": "Shoulders",
+            "Bicep Curls": "Arms",
+            "Tricep Extensions": "Arms",
+            "Planks": "Core",
+            "Leg Raises": "Core"
+        };
+
+        function handleExerciseChange() {
+            const select = document.getElementById('exerciseSelect');
+            const bodyPartSelect = document.getElementById('bodyPartSelect');
+            const customContainer = document.getElementById('customExerciseContainer');
+            
+            const selectedValue = select.value;
+            
+            if (selectedValue === 'custom') {
+                customContainer.style.display = 'block';
+            } else {
+                customContainer.style.display = 'none';
+                if (exerciseMap[selectedValue]) {
+                    bodyPartSelect.value = exerciseMap[selectedValue];
+                }
+            }
+        }
+
         // Modal Logic
         const modal = document.getElementById("logModal");
         function openModal() { modal.style.display = "block"; }
@@ -580,7 +684,18 @@
         window.onclick = function(event) { if (event.target == modal) closeModal(); }
 
         function saveWorkout() {
-            alert("Activity Saved! Volume tracked and added to trends.");
+            const select = document.getElementById('exerciseSelect');
+            const customInput = document.getElementById('customExerciseInput');
+            const bodyPart = document.getElementById('bodyPartSelect').value;
+            
+            const exerciseName = select.value === 'custom' ? customInput.value : select.value;
+            
+            if (!exerciseName) {
+                alert("Please enter an exercise name.");
+                return;
+            }
+
+            alert(`Activity Saved!\nExercise: ${exerciseName}\nBody Part: ${bodyPart}\nVolume tracked and added to trends.`);
             closeModal();
         }
 
