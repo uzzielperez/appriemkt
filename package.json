@@ -2,6 +2,9 @@
     "name": "netlify-chat-app",
     "version": "1.0.0",
     "description": "Chat app with multiple AI model support",
+    "scripts": {
+        "desktop": "cd desktop-app && npm start"
+    },
     "dependencies": {
         "@anthropic-ai/sdk": "^0.10.2",
         "axios": "^1.10.0",

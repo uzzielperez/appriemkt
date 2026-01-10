@@ -632,6 +632,7 @@
         </div>
     </div>
 
+    <script src="../js/analytics.js"></script>
     <script>
         // Exercise to Body Part Mapping
         const exerciseMap = {
@@ -679,7 +680,12 @@
 
         // Modal Logic
         const modal = document.getElementById("logModal");
-        function openModal() { modal.style.display = "block"; }
+        function openModal() { 
+            modal.style.display = "block"; 
+            if (window.trackEvent) {
+                trackEvent('open_workout_modal', { page: 'body_intelligence' });
+            }
+        }
         function closeModal() { modal.style.display = "none"; }
         window.onclick = function(event) { if (event.target == modal) closeModal(); }
 
@@ -693,6 +699,13 @@
             if (!exerciseName) {
                 alert("Please enter an exercise name.");
                 return;
+            }
+
+            if (window.trackEvent) {
+                trackEvent('save_workout', { 
+                    exercise: exerciseName,
+                    body_part: bodyPart
+                });
             }
 
             alert(`Activity Saved!\nExercise: ${exerciseName}\nBody Part: ${bodyPart}\nVolume tracked and added to trends.`);

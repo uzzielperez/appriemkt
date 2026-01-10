@@ -98,7 +98,7 @@
         
         <!-- Floating Preview Button -->
         <div class="preview-button-container">
-            <a class="btn-copilot text-uppercase" href="chat.html">
+            <a class="btn-copilot text-uppercase" href="chat.html" onclick="if(window.trackEvent) trackEvent('click_floating_copilot')">
                 <i class="fas fa-robot"></i> Try Copilot
             </a>
         </div>
@@ -192,6 +192,8 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
+        <!-- Analytics Tracking -->
+        <script src="js/analytics.js"></script>
         <!-- Typewriter Script-->
         <script src="js/typewriter.js"></script>
     </body>

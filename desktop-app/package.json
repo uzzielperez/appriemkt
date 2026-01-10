@@ -1,0 +1,14 @@
+{
+  "name": "apprie-desktop",
+  "version": "1.0.0",
+  "description": "Apprie Desktop Proof of Concept",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Apprie",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
+}

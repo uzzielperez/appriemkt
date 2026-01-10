@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Discovery Lab - Apprie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --primary-teal: #008080;
+            --accent-cyan: #00ffff;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --lab-purple: #bb86fc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .lab-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #222;
+        }
+
+        .molecule-viewer {
+            height: 400px;
+            background: #000;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px dashed #333;
+        }
+
+        .molecule-mock {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--lab-purple) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: pulse 4s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 0.5; }
+            to { transform: scale(1.5); opacity: 0.8; }
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+
+        .data-table th, .data-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #222;
+        }
+
+        .data-table th { color: var(--text-gray); text-transform: uppercase; font-size: 0.7rem; }
+
+        .binding-score {
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .status-pill {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .status-active { background: rgba(0, 255, 255, 0.1); color: var(--accent-cyan); }
+        .status-candidate { background: rgba(187, 134, 252, 0.1); color: var(--lab-purple); }
+
+        .search-box {
+            width: 100%;
+            background: #050505;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .research-agent {
+            background: rgba(187, 134, 252, 0.05);
+            border: 1px solid var(--lab-purple);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <a href="../products.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Products</a>
+        
+        <div class="header">
+            <div>
+                <h1>Drug Discovery Lab <span style="background: var(--lab-purple); color: black; padding: 2px 8px; border-radius: 50px; font-size: 0.6rem; font-weight: 800; vertical-align: middle; margin-left: 10px;">RESEARCH</span></h1>
+                <p style="color: var(--text-gray); margin-top: 5px;">AI-Powered Compound Analysis & Indication Mapping</p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">Active Session: 22-A</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Target: mTOR Pathway</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lab-grid">
+            <div class="lab-card">
+                <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Molecular Workbench</h3>
+                <div class="molecule-viewer">
+                    <div class="molecule-mock"></div>
+                    <div style="position: absolute; top: 20px; left: 20px; font-size: 0.7rem; color: var(--lab-purple);">
+                        <i class="fas fa-cube"></i> COMPOUND: RAP-001 (Rapamycin Analog)
+                    </div>
+                    <div style="position: absolute; bottom: 20px; right: 20px; text-align: right;">
+                        <div style="font-size: 0.7rem; color: var(--text-gray);">DOCKING SCORE</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-cyan);">-9.4 kcal/mol</div>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Compound ID</th>
+                            <th>Original Indication</th>
+                            <th>New Target</th>
+                            <th>Repurposing Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Metformin</td>
+                            <td>Type 2 Diabetes</td>
+                            <td>Longevity / AMPK</td>
+                            <td class="binding-score">0.88</td>
+                            <td><span class="status-pill status-active">ACTIVE STUDY</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sirolimus</td>
+                            <td>Immunosuppressant</td>
+                            <td>Cellular Senescence</td>
+                            <td class="binding-score">0.94</td>
+                            <td><span class="status-pill status-candidate">CANDIDATE</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dasatinib</td>
+                            <td>Leukemia</td>
+                            <td>Senolytic Clearance</td>
+                            <td class="binding-score">0.82</td>
+                            <td><span class="status-pill status-candidate">CANDIDATE</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="lab-card research-agent">
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--lab-purple); margin-bottom: 15px;">Lab Assistant Agent</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.5;">
+                        "I've identified <strong>14 high-confidence candidates</strong> for repurposing towards SIRT1 activation. Compound <strong>APP-442</strong> shows a 22% better binding affinity than previous benchmarks."
+                    </p>
+                    <button style="width: 100%; background: var(--lab-purple); border: none; color: black; padding: 10px; border-radius: 8px; font-weight: 700; margin-top: 15px; cursor: pointer;">Generate Report</button>
+                </div>
+
+                <div class="lab-card">
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-gray); margin-bottom: 15px;">Search Compounds</h4>
+                    <input type="text" class="search-box" placeholder="Enter CID or SMILES string...">
+                    <div style="font-size: 0.7rem; color: var(--text-gray);">
+                        <i class="fas fa-info-circle"></i> Search over 110M compounds in the Apprie Knowledge Graph.
+                    </div>
+                </div>
+
+                <div class="lab-card">
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-gray); margin-bottom: 15px;">Target Map</h4>
+                    <canvas id="targetChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('targetChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Affinity', 'Solubility', 'Toxicity', 'Selectivity', 'Stability'],
+                datasets: [{
+                    label: 'Current Candidate',
+                    data: [90, 65, 85, 70, 80],
+                    borderColor: '#00ffff',
+                    backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        grid: { color: '#333' },
+                        angleLines: { color: '#333' },
+                        pointLabels: { color: '#a0a0a0' },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin Dashboard - Apprie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --primary-teal: #008080;
+            --accent-cyan: #00ffff;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --twin-gold: #ffcc00;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .nav-back {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .twin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 25px;
+        }
+
+        .twin-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #222;
+        }
+
+        .twin-viewer {
+            height: 500px;
+            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.05) 0%, transparent 80%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid #222;
+        }
+
+        .biological-clock {
+            text-align: center;
+            padding: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--twin-gold);
+            width: 150px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
+        }
+
+        .intervention-slider {
+            width: 100%;
+            margin: 15px 0;
+            accent-color: var(--accent-cyan);
+        }
+
+        .marker-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .marker-label { font-size: 0.8rem; color: var(--text-gray); }
+        .marker-value { font-weight: 700; color: var(--accent-cyan); }
+
+        .simulation-active {
+            color: var(--twin-gold);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <a href="../products.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Products</a>
+        
+        <div class="header">
+            <div>
+                <h1>Digital Twin Dashboard <span style="background: var(--twin-gold); color: black; padding: 2px 8px; border-radius: 50px; font-size: 0.6rem; font-weight: 800; vertical-align: middle; margin-left: 10px;">PREMIUM</span></h1>
+                <p style="color: var(--text-gray); margin-top: 5px;">Predictive Longevity Simulation & Biometric Twin</p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">Twin ID: APP-TWIN-01</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Sync: Real-time (Garmin/Oura)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="twin-grid">
+            <!-- Left: Biological Clock -->
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="twin-card">
+                    <h3 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-gray); margin-bottom: 20px;">Biological Age</h3>
+                    <div class="biological-clock">
+                        <div style="font-size: 2.5rem; font-weight: 800;">32.4</div>
+                        <div style="font-size: 0.7rem; color: var(--twin-gold);">YEARS</div>
+                    </div>
+                    <p style="text-align: center; font-size: 0.85rem; color: var(--text-gray);">
+                        Chronological Age: <strong>38</strong><br>
+                        <span style="color: var(--success-green);">-5.6 years differential</span>
+                    </p>
+                </div>
+
+                <div class="twin-card">
+                    <h3 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-gray); margin-bottom: 15px;">Organ Health Scores</h3>
+                    <div class="marker-item">
+                        <span class="marker-label">Cardiovascular</span>
+                        <span class="marker-value">92%</span>
+                    </div>
+                    <div class="marker-item">
+                        <span class="marker-label">Metabolic</span>
+                        <span class="marker-value">88%</span>
+                    </div>
+                    <div class="marker-item">
+                        <span class="marker-label">Neurological</span>
+                        <span class="marker-value">95%</span>
+                    </div>
+                    <div class="marker-item">
+                        <span class="marker-label">Renal/Liver</span>
+                        <span class="marker-value">84%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle: Twin Viewer -->
+            <div class="twin-viewer">
+                <!-- Simple 3D Mock -->
+                <i class="fas fa-user-shield" style="font-size: 15rem; color: rgba(0, 255, 255, 0.1);"></i>
+                <div style="position: absolute; top: 30px; width: 100%; text-align: center;">
+                    <span class="simulation-active"><i class="fas fa-sync fa-spin"></i> Simulation Active</span>
+                    <h2 style="font-size: 1.2rem; margin: 0;">20-Year Health Forecast</h2>
+                </div>
+                
+                <div style="position: absolute; bottom: 30px; width: 80%; background: rgba(17, 17, 17, 0.9); padding: 20px; border-radius: 15px; border: 1px solid #333;">
+                    <div class="marker-item" style="border:none;">
+                        <span style="font-size: 0.7rem; color: var(--twin-gold);">TIMELINE PROJECTION</span>
+                        <span id="yearValue" style="font-weight: 800; color: var(--twin-gold);">+0 YEARS</span>
+                    </div>
+                    <input type="range" class="intervention-slider" min="0" max="40" value="0" id="yearSlider">
+                </div>
+            </div>
+
+            <!-- Right: Interventions -->
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="twin-card" style="border-color: var(--primary-teal);">
+                    <h3 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 20px;">Test Intervention</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.7rem; color: var(--text-gray);">SUPPLEMENTATION</label>
+                        <select style="width: 100%; background: #050505; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                            <option>Metformin (500mg/day)</option>
+                            <option>Rapamycin (5mg/week)</option>
+                            <option>NAD+ Precursors</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.7rem; color: var(--text-gray);">LIFESTYLE ADAPTATION</label>
+                        <select style="width: 100%; background: #050505; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                            <option>Intermittent Fasting (16:8)</option>
+                            <option>Ketogenic Diet</option>
+                            <option>HIIT (3x weekly)</option>
+                        </select>
+                    </div>
+
+                    <button style="width: 100%; background: var(--primary-teal); border: none; color: white; padding: 12px; border-radius: 8px; font-weight: 700; margin-top: 10px; cursor: pointer;">Run What-If Analysis</button>
+                </div>
+
+                <div class="twin-card">
+                    <h3 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-gray); margin-bottom: 15px;">Simulated Lifespan Impact</h3>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--success-green);">+4.2 <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-gray);">YEARS</span></div>
+                    <p style="font-size: 0.75rem; color: var(--text-gray); margin-top: 10px;">
+                        Predicted healthspan extension based on current intervention simulation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('yearSlider');
+        const yearValue = document.getElementById('yearValue');
+        
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            yearValue.innerText = `+${val} YEARS`;
+        });
+    </script>
+</body>
+</html>

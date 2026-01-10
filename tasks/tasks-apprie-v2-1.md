@@ -40,8 +40,8 @@ Check off tasks as they are completed using `[x]`.
         - [x] 2.2.6.3 Diet Integration: Baseline display for nutritional intake
         - [x] 2.2.6.4 Workout Logger (Strava-style): UI for logging exercises, weights, reps, and sets
         - [x] 2.2.6.5 Volume Increase Tracking: Automated calculation and visualization of Progressive Overload volume trends
-  - [ ] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization (static/mock)
-  - [ ] 2.4 Research - Digital Twin: Create Health Dashboard UI for longevity research
+  - [x] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization and repurposed drug mapping
+  - [x] 2.4 Research - Digital Twin: Create Health Dashboard UI with intervention simulation and biological age tracking
 - [ ] 3.0 Support & Monetization
   - [ ] 3.1 Build Support page with tiered pricing (Individual vs Enterprise)
   - [ ] 3.2 Implement White-labeling options (API, Custom Instance, Compliance)
@@ -61,6 +61,16 @@ Check off tasks as they are completed using `[x]`.
 - [ ] 6.0 Technical & Legal Essentials
   - [ ] 6.1 Upgrade Contact Form: Validation feedback, success/error states, and response time note
   - [ ] 6.2 Legal Compliance: Replace placeholder links for Privacy Policy & Terms of Use
+  - [ ] 6.3 Analytics & Tracking (New):
+    - [x] 6.3.1 Google Analytics 4 (GA4): Integrate tag for visitor and event tracking (ID: G-RLK1ZG1NGJ)
+    - [x] 6.3.2 Google Consent Mode v2: Implement default-deny and consent banner for privacy compliance
+    - [x] 6.3.3 Custom Event Tracking: Track key actions (Copilot clicks, Workout logs, Subscription signups)
+    - [ ] 6.3.4 User Dashboard: Create a basic analytics view for internal monitoring
+  - [ ] 6.4 SEO & Search Console (New):
+    - [ ] 6.4.1 Sitemap Generation: Create `sitemap.xml` for search engine indexing
+    - [ ] 6.4.2 Robots.txt: Configure `robots.txt` for crawler management
+    - [ ] 6.4.3 Search Console: Implement verification (HTML tag) and property setup
+    - [ ] 6.4.4 Meta Tags: Optimize page-specific meta titles/descriptions for medical SEO
 - [ ] 7.0 Compliance & Medical AI Infrastructure
   - [ ] 7.1 Security Certification Prep: Document SOC 2 Type II audit requirements and existing controls
   - [ ] 7.2 Privacy Compliance: Implement GDPR/CCPA automated compliance controls and data mapping
