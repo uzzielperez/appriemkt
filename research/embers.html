@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>Embers - Creative Companion | Apprie Research</title>
+        <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <link href="../css/styles.css" rel="stylesheet" />
+        <style>
+            :root {
+                --embers-bg: #fdfaf6;
+                --embers-text: #4a4a4a;
+                --embers-accent: #a8b5a2; /* Sage Green */
+                --embers-secondary: #d4a373; /* Warm Sand */
+            }
+            body {
+                background-color: var(--embers-bg);
+                color: var(--embers-text);
+                font-family: 'Lora', serif;
+                transition: opacity 1s ease;
+            }
+            .hero-section {
+                padding: 10rem 0 6rem;
+                text-align: center;
+                background: linear-gradient(180deg, #fdfaf6 0%, #f4f1ea 100%);
+            }
+            .concept-badge {
+                display: inline-block;
+                padding: 0.5rem 1.5rem;
+                background-color: var(--embers-accent);
+                color: white;
+                border-radius: 50px;
+                font-family: 'Inter', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 500;
+                margin-bottom: 2rem;
+            }
+            .embers-heading {
+                font-size: 3.5rem;
+                margin-bottom: 1.5rem;
+                color: #2c2c2c;
+            }
+            .embers-subheading {
+                font-size: 1.25rem;
+                max-width: 800px;
+                margin: 0 auto;
+                line-height: 1.8;
+                font-style: italic;
+                color: #666;
+            }
+            .feature-grid {
+                padding: 6rem 0;
+            }
+            .feature-item {
+                background: white;
+                padding: 3rem;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+                height: 100%;
+                border: 1px solid #f0ede8;
+                transition: transform 0.3s ease;
+            }
+            .feature-item:hover {
+                transform: translateY(-5px);
+            }
+            .feature-icon {
+                font-size: 2rem;
+                color: var(--embers-accent);
+                margin-bottom: 1.5rem;
+            }
+            .feature-title {
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+            .quote-section {
+                padding: 8rem 0;
+                background-color: #f4f1ea;
+                text-align: center;
+            }
+            .quote-text {
+                font-size: 2rem;
+                max-width: 900px;
+                margin: 0 auto;
+                line-height: 1.5;
+            }
+            .garden-preview {
+                height: 400px;
+                background: white;
+                border-radius: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px dashed #e0ded8;
+                margin-top: 3rem;
+            }
+            .nav-link {
+                color: var(--embers-text) !important;
+            }
+            .btn-embers {
+                background-color: var(--embers-accent);
+                color: white;
+                border-radius: 50px;
+                padding: 1rem 2.5rem;
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                border: none;
+                transition: all 0.3s ease;
+            }
+            .btn-embers:hover {
+                background-color: #8f9b8a;
+                transform: scale(1.02);
+            }
+            .regulatory-note {
+                font-size: 0.85rem;
+                color: #999;
+                margin-top: 2rem;
+            }
+        </style>
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav" style="background-color: rgba(253, 250, 246, 0.95);">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html"><img src="../assets/img/triangular-logo.svg" alt="..." style="filter: invert(0.3);" /></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars ms-1"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="../products.html">Products</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../support.html">Support</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero-->
+        <header class="hero-section">
+            <div class="container">
+                <div class="concept-badge">Product Concept & Design Prompt</div>
+                <h1 class="embers-heading">Embers</h1>
+                <p class="embers-subheading">A creative companion for heavy days. A soothing mobile experience designed to help people living with chronic illness process emotions through gentle self-expression.</p>
+                <div class="mt-5">
+                    <button class="btn-embers">View Initial MVP Scope</button>
+                </div>
+                <p class="regulatory-note"><i class="fas fa-shield-alt me-2"></i> Regulatory-Safe: No medical diagnosis, treatment, or therapy advice provided.</p>
+            </div>
+        </header>
+
+        <!-- Features-->
+        <section class="feature-grid">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-pen-fancy"></i></div>
+                            <h4 class="feature-title">Creative Prompts</h4>
+                            <p>Daily 2–5 minute prompts for writing, drawing, and audio reflection. Deeply respectful of limited physical and emotional energy.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-microphone-alt"></i></div>
+                            <h4 class="feature-title">Voice Journaling</h4>
+                            <p>Seamless voice-to-journal capture for low-energy days when typing is too much. Process memories and identity shifts out loud.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-palette"></i></div>
+                            <h4 class="feature-title">Micro Creative Studio</h4>
+                            <p>Tools for scribbles, photo collages, micro-movies, and tiny soundscapes. A quiet space for non-verbal expression.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mt-2">
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-seedling"></i></div>
+                            <h4 class="feature-title">Memory Garden</h4>
+                            <p>A gallery where your creations grow like trees, stones, and flowers. A visual representation of your resilience over time.</p>
+                            <div class="garden-preview">
+                                <span class="text-muted small">Garden Visualization Mockup</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-tags"></i></div>
+                            <h4 class="feature-title">Emotional Tagging</h4>
+                            <p>Color-based emotional tagging instead of rigid moods or diagnoses. Track shifts in perspective without medical labels.</p>
+                            <div class="mt-4">
+                                <span class="badge bg-light text-dark border me-2">Soothing Sage</span>
+                                <span class="badge bg-light text-dark border me-2">Golden Reflection</span>
+                                <span class="badge bg-light text-dark border me-2">Deep Calm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tone & Brand-->
+        <section class="quote-section">
+            <div class="container">
+                <div class="mb-5">
+                    <h3 class="text-uppercase small fw-bold text-muted mb-4">Tone & Brand</h3>
+                    <p class="quote-text">"Your story matters. Even on the days when it feels heavy."</p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <p class="mb-0">Warm, calm, and zero gamification. Embers acknowledges that some days are for creating, and some are for simply being.</p>
+                        <div class="mt-4">
+                            <p class="fst-italic">“That was enough for today.”</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer-->
+        <footer class="footer py-5" style="background-color: #fdfaf6;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 text-lg-start">Copyright &copy; Apprie 2025</div>
+                    <div class="col-lg-4 text-center">
+                        <a class="text-decoration-none text-dark me-3" href="../products.html">Back to Products</a>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a class="link-dark text-decoration-none me-3" href="../privacy.html">Privacy</a>
+                        <a class="link-dark text-decoration-none" href="../terms.html">Terms</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="../js/scripts.js"></script>
+        <script>
+            // Fade in effect
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.style.opacity = '1';
+            });
+        </script>
+    </body>
+</html>

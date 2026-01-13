@@ -42,6 +42,9 @@ Check off tasks as they are completed using `[x]`.
         - [x] 2.2.6.5 Volume Increase Tracking: Automated calculation and visualization of Progressive Overload volume trends
   - [x] 2.3 Research - Drug Discovery: Implement AI molecule modeling visualization and repurposed drug mapping
   - [x] 2.4 Research - Digital Twin: Create Health Dashboard UI with intervention simulation and biological age tracking
+  - [x] 2.5 Embers: Implement Creative Companion for chronic illness emotional health
+    - [x] 2.5.1 Design soothing aesthetic (Lora/Inter typography, Sage palette)
+    - [x] 2.5.2 Build product concept page with MVP scope (Memory Garden, Voice Journaling)
 - [ ] 3.0 Support & Monetization
   - [ ] 3.1 Build Support page with tiered pricing (Individual vs Enterprise)
   - [ ] 3.2 Implement White-labeling options (API, Custom Instance, Compliance)
@@ -67,8 +70,8 @@ Check off tasks as they are completed using `[x]`.
     - [x] 6.3.3 Custom Event Tracking: Track key actions (Copilot clicks, Workout logs, Subscription signups)
     - [ ] 6.3.4 User Dashboard: Create a basic analytics view for internal monitoring
   - [ ] 6.4 SEO & Search Console (New):
-    - [ ] 6.4.1 Sitemap Generation: Create `sitemap.xml` for search engine indexing
-    - [ ] 6.4.2 Robots.txt: Configure `robots.txt` for crawler management
+    - [x] 6.4.1 Sitemap Generation: Create `sitemap.xml` for search engine indexing
+    - [x] 6.4.2 Robots.txt: Configure `robots.txt` for crawler management
     - [ ] 6.4.3 Search Console: Implement verification (HTML tag) and property setup
     - [ ] 6.4.4 Meta Tags: Optimize page-specific meta titles/descriptions for medical SEO
 - [ ] 7.0 Compliance & Medical AI Infrastructure

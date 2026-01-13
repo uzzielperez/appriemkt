@@ -126,6 +126,12 @@
 - **Desktop Distribution:**
     - Verified and optimized the **Electron-based Desktop App** PoC, enabling native execution via `npm run desktop`.
 
+### [2026-01-13] - Emotional Health & Creative Companion
+- **Feature**: Added **Embers**, the 5th product in the Apprie suite, focused on emotional resilience for chronic illness patients.
+- **Feat**: Launched `research/embers.html` with a soothing, slow-tech aesthetic (Lora/Inter typography, Sage/Warm Sand palette).
+- **Design**: Detailed the MVP scope including creative prompts, voice journaling, and a "Memory Garden" gallery for self-expression.
+- **Compliance**: Integrated regulatory-safe positioning (no diagnosis/therapy) into the product concept.
+
 ---
 ### 🚀 Future Roadmap & Next Steps
 - [ ] **B2B & White-Labeling:** Build the Support page with tiered pricing and an interactive "Theme Customizer" for white-label previews.
