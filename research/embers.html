@@ -6,20 +6,26 @@
         <title>Embers - Creative Companion | Apprie Research</title>
         <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
         <link href="../css/styles.css" rel="stylesheet" />
         <style>
             :root {
                 --embers-bg: #fdfaf6;
-                --embers-text: #4a4a4a;
-                --embers-accent: #a8b5a2; /* Sage Green */
+                --embers-text: #3c3c3c;
+                --embers-accent: #5f9ea0; /* Soft Teal/CadetBlue - bridging to Apprie Teal */
                 --embers-secondary: #d4a373; /* Warm Sand */
+                --embers-heading: 'Montserrat', sans-serif;
             }
             body {
                 background-color: var(--embers-bg);
                 color: var(--embers-text);
                 font-family: 'Lora', serif;
                 transition: opacity 1s ease;
+            }
+            h1, h2, h3, h4, h5, .navbar-brand {
+                font-family: var(--embers-heading);
+                font-weight: 700;
+                letter-spacing: -0.02em;
             }
             .hero-section {
                 padding: 10rem 0 6rem;
@@ -144,14 +150,52 @@
         <header class="hero-section">
             <div class="container">
                 <div class="concept-badge">Product Concept & Design Prompt</div>
-                <h1 class="embers-heading">Embers</h1>
+                <h1 class="embers-heading text-uppercase">Embers</h1>
                 <p class="embers-subheading">A creative companion for heavy days. A soothing mobile experience designed to help people living with chronic illness process emotions through gentle self-expression.</p>
                 <div class="mt-5">
-                    <button class="btn-embers">View Initial MVP Scope</button>
+                    <button class="btn-embers" onclick="scrollToPrompts()">Explore the Experience</button>
                 </div>
                 <p class="regulatory-note"><i class="fas fa-shield-alt me-2"></i> Regulatory-Safe: No medical diagnosis, treatment, or therapy advice provided.</p>
             </div>
         </header>
+
+        <!-- Prompt Carousel Section -->
+        <section id="prompts" class="py-5" style="background-color: #fff;">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="text-uppercase">Daily Gentle Prompts</h2>
+                    <p class="text-muted">Low-energy creative sparks for writing, art, and reflection.</p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div id="promptCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner p-5 shadow-sm border rounded-4 bg-light text-center">
+                                <div class="carousel-item active">
+                                    <h3 class="mb-4">"Draw the shape of your breath right now."</h3>
+                                    <p class="text-muted">Use the micro-sketch tool to trace the rhythm of your inhale and exhale.</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <h3 class="mb-4">"If your energy was a color today, what would it be?"</h3>
+                                    <p class="text-muted">Tag your entry with a color that feels right—no labels required.</p>
+                                </div>
+                                <div class="carousel-item">
+                                    <h3 class="mb-4">"Record a 30-second audio note of one small thing that felt soft today."</h3>
+                                    <p class="text-muted">Voice-to-journal for the days when holding a pen is too much.</p>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#promptCarousel" data-bs-slide="prev" style="filter: invert(1);">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#promptCarousel" data-bs-slide="next" style="filter: invert(1);">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Features-->
         <section class="feature-grid">
@@ -196,10 +240,12 @@
                             <div class="feature-icon"><i class="fas fa-tags"></i></div>
                             <h4 class="feature-title">Emotional Tagging</h4>
                             <p>Color-based emotional tagging instead of rigid moods or diagnoses. Track shifts in perspective without medical labels.</p>
-                            <div class="mt-4">
-                                <span class="badge bg-light text-dark border me-2">Soothing Sage</span>
-                                <span class="badge bg-light text-dark border me-2">Golden Reflection</span>
-                                <span class="badge bg-light text-dark border me-2">Deep Calm</span>
+                            <div class="mt-4 p-3 rounded-3 bg-light border-dashed">
+                                <p class="small text-muted mb-2">Tap to see tag impact:</p>
+                                <button class="btn btn-sm btn-outline-secondary me-2 mb-2" onclick="previewTag('sage', '#76b5b5')">Soothing Sage</button>
+                                <button class="btn btn-sm btn-outline-secondary me-2 mb-2" onclick="previewTag('gold', '#d4a373')">Golden Reflection</button>
+                                <button class="btn btn-sm btn-outline-secondary me-2 mb-2" onclick="previewTag('calm', '#5f9ea0')">Deep Calm</button>
+                                <div id="tagPreview" class="mt-2 small italic text-muted" style="height: 20px;"></div>
                             </div>
                         </div>
                     </div>
@@ -250,6 +296,19 @@
             document.addEventListener('DOMContentLoaded', () => {
                 document.body.style.opacity = '1';
             });
+
+            function scrollToPrompts() {
+                document.getElementById('prompts').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function previewTag(name, color) {
+                const preview = document.getElementById('tagPreview');
+                preview.style.color = color;
+                preview.innerText = `Tagging with ${name}... Setting the interface tone.`;
+                setTimeout(() => {
+                    preview.innerText = "";
+                }, 3000);
+            }
         </script>
     </body>
 </html>

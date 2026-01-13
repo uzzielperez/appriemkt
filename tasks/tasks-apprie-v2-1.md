@@ -45,6 +45,10 @@ Check off tasks as they are completed using `[x]`.
   - [x] 2.5 Embers: Implement Creative Companion for chronic illness emotional health
     - [x] 2.5.1 Design soothing aesthetic (Lora/Inter typography, Sage palette)
     - [x] 2.5.2 Build product concept page with MVP scope (Memory Garden, Voice Journaling)
+    - [x] 2.5.3 Suite Alignment: Update typography to Montserrat for headings and refine accent colors to "Soft Teal"
+    - [x] 2.5.4 Interactive Mocks: Add a sample prompt carousel and an interactive "Color-Tagging" preview
+    - [ ] 2.5.5 Visual Storytelling: Enhance the "Memory Garden" section with subtle CSS animations (blooming effects)
+    - [ ] 2.5.6 Premium Light-Mode: Refine shadows, borders, and spacing to match the high-end feel of the dark-mode suite
 - [ ] 3.0 Support & Monetization
   - [ ] 3.1 Build Support page with tiered pricing (Individual vs Enterprise)
   - [ ] 3.2 Implement White-labeling options (API, Custom Instance, Compliance)

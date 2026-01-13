@@ -129,7 +129,8 @@
 ### [2026-01-13] - Emotional Health & Creative Companion
 - **Feature**: Added **Embers**, the 5th product in the Apprie suite, focused on emotional resilience for chronic illness patients.
 - **Feat**: Launched `research/embers.html` with a soothing, slow-tech aesthetic (Lora/Inter typography, Sage/Warm Sand palette).
-- **Design**: Detailed the MVP scope including creative prompts, voice journaling, and a "Memory Garden" gallery for self-expression.
+- **Refinement**: Aligned Embers design with the Apprie suite by integrating **Montserrat** for headings and a **Soft Teal** brand bridge color.
+- **Interactivity**: Added a **Daily Prompt Carousel** and smooth-scroll navigation to showcase the creative experience.
 - **Compliance**: Integrated regulatory-safe positioning (no diagnosis/therapy) into the product concept.
 
 ---
